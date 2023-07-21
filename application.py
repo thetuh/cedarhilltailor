@@ -1,6 +1,8 @@
 from flask import Flask
+from flask import render_template;
+
 application = Flask(__name__)
 
 @application.route('/')
-def login():
-    return 'Hello, World!'
+def home():
+    return render_template('index.html')
