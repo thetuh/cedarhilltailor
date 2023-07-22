@@ -16,3 +16,4 @@ class User(db.Model):
 @application.route('/')
 def home():
     return render_template('index.html')
+
