@@ -13,8 +13,6 @@ class User(db.Model):
     username = db.Column(db.String(120), primary_key=True)
     password = db.Column(db.String(120), nullable=False)
 
-
-
 @application.route('/')
 def home():
     return render_template('index.html')
