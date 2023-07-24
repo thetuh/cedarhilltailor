@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import pymysql
 
 pymysql.install_as_MySQLdb()
@@ -12,9 +13,33 @@ application.secret_key = "cedarhilltailor"
 db = SQLAlchemy(application)
 
 class User(db.Model):
-    username = db.Column(db.String(120), primary_key=True)
-    password = db.Column(db.String(120), nullable=False)
+    username = db.Column(db.String(150), primary_key=True)
+    password = db.Column(db.String(150), nullable=False)
 
 @application.route('/')
 def home():
+    return render_template('index.html')
+
+@application.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        # Sanity checks
+        if len(username) < 1:
+            flash('Please enter a username', category='error')
+            return render_template('index.html')
+        elif len(password) < 1:
+            flash('Please enter a password', category='error')
+            return render_template('index.html')
+
+        # Authentication
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            return ('Success')
+        else:
+            return ('Invalid login')
+
+
     return render_template('index.html')
