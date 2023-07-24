@@ -5,7 +5,6 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 application = Flask(__name__)
-
 application.config['SQLALCHEMY_DATABASE_URI']='mysql://root:password@awseb-e-f39h2b6uxw-stack-awsebrdsdatabase-oufcg7eqqkbx.cww0u0pb9txq.us-east-2.rds.amazonaws.com/user'
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 application.secret_key = "cedarhilltailor"
