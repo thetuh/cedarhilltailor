@@ -4,4 +4,11 @@
 {% block content %}
 <br>
 <h1 align="center">Hi, {{ current_user.username }}!</h1>
+<br>
+
+{% if current_user.id == 1 %}
+<div class = "dashboard--container">
+    <h3>Dashboard</h3>
+</div>
+{% endif %}
 {% endblock %}

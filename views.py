@@ -7,3 +7,13 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     return render_template('home.html')
+
+@views.route('/search-order', methods=['GET', 'POST'])
+@login_required
+def search_order():
+    return render_template('search-order.html')
+
+@views.route('/create-order', methods=['GET', 'POST'])
+@login_required
+def create_order():
+    return render_template('create-order.html')

@@ -17,6 +17,11 @@
         crossorigin="anonymous"
         />
 
+        <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+        />
+
       <title>{% block title %}Home{% endblock %}</title>
     </head>
 
@@ -28,7 +33,14 @@
 
             <div class="collapse navbar-collapse" id="navbar">
                 <div class="navbar-nav">
+                    {% if current_user.id == 3 %}
+                    <a class="nav-item nav-link" id="login" href="/login">Login</a>
+                    {% endif %}
                     <a class="nav-item nav-link" id="home" href="/">Home</a>
+                    {% if current_user.id == 1 or current_user.id == 2 %}
+                    <a class="nav-item nav-link" id="create-order" href="/create-order">Create order</a>
+                    {% endif %}
+                    <a class="nav-item nav-link" id="search-order" href="/search-order">Search order</a>
                     <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
                 </div>
             </div>
