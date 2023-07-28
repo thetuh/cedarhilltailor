@@ -29,7 +29,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             session.pop('_flashes', None)
-            flash('Logged in successfully!', category='success')
+            flash('Logged in successfully', category='success')
             login_user(user, remember=True)
             return redirect(url_for('views.home'))
         else:
@@ -41,5 +41,7 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+    session.pop('_flashes', None)
+    flash('Logged out successfully', category='success')
     logout_user()
     return redirect(url_for('auth.login'))
