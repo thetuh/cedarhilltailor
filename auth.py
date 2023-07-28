@@ -6,17 +6,6 @@ from alert import email_alert
 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/guest')
-def guest_login():
-    user = User.query.filter_by(username='guest').first()
-    if user:
-        login_user(user, remember=True)
-        return redirect(url_for('views.home'))
-    else:
-        flash('Something went wrong', category='error')
-    
-    return render_template('login.html')
-
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
