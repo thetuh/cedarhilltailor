@@ -26,12 +26,17 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
+        error = []
+
         # Sanity checks
         if len(username) < 1:
-            flash('Please enter a username', category='error')
-            return render_template('index.html')
+            error.append('Please enter username')
         elif len(password) < 1:
-            flash('Please enter a password', category='error')
+            error.append('Please enter password')
+
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
             return render_template('index.html')
 
         # Authentication
@@ -39,7 +44,7 @@ def login():
         if user and check_password_hash(user.password, password):
             return ('Success')
         else:
-            return ('Invalid login')
+            flash('Invalid login', category='error')
 
 
     return render_template('index.html')
