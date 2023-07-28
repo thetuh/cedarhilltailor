@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, flash
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 import pymysql
+from flask import Flask
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
 
 pymysql.install_as_MySQLdb()
 
@@ -12,39 +12,21 @@ application.secret_key = "cedarhilltailor"
 
 db = SQLAlchemy(application)
 
-class User(db.Model):
-    username = db.Column(db.String(150), primary_key=True)
-    password = db.Column(db.String(150), nullable=False)
+from views import views
+from auth import auth
 
-@application.route('/')
-def home():
-    return render_template('index.html')
+application.register_blueprint(views, url_prefix='/')
+application.register_blueprint(auth, url_prefix='/')
 
-@application.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+from models import User
 
-        error = []
+with application.app_context():
+    db.create_all()
 
-        # Sanity checks
-        if len(username) < 1:
-            error.append('Please enter username')
-        elif len(password) < 1:
-            error.append('Please enter password')
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.init_app(application)
 
-        if error:
-            error_message = ' '.join(error)
-            flash(error_message, category='error')
-            return render_template('index.html')
-
-        # Authentication
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            return ('Success')
-        else:
-            flash('Invalid login', category='error')
-
-
-    return render_template('index.html')
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
