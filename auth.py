@@ -2,6 +2,7 @@ from models import User
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session
 from werkzeug.security import check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
+from alert import email_alert
 
 auth = Blueprint('auth', __name__)
 
@@ -31,6 +32,7 @@ def login():
             session.pop('_flashes', None)
             flash('Logged in successfully', category='success')
             login_user(user, remember=True)
+            # email_alert('Cedar Hill Alteration - Login Alert', user.username + " logged in from I.P. address " + request.remote_addr, 'email@gmail.com')
             return redirect(url_for('views.home'))
         else:
             flash('Invalid login', category='error')
