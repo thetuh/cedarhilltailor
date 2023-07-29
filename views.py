@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
-
+from application import db
 from models import User
 
 views = Blueprint('views', __name__)
@@ -80,8 +80,9 @@ def edit_user():
                 flash(error_message, category='error')
                 return redirect(url_for('views.manage_users'))
 
-            new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
-            db.session.add(User)
+            # Update the user object with new data
+            user.username = username
+            user.password = generate_password_hash(password, method='sha256')
             db.session.commit()
 
             flash('Successfully updated ' + user.username, category='success')
