@@ -36,7 +36,22 @@ def manage_users():
         flash('Unauthorized access', category='error')
         return redirect(url_for('views.home'))
 
-@views.route('/users/edit-user', methods=['GET', 'POST'])
+@views.route('/users/delete')
+@login_required
+def delete_user():
+    if current_user.id == 1:
+        user = User.query.get(request.form.get('id'))
+        if not user:
+            flash('User not found', category='error')
+            return redirect(url_for('views.manage_users'))
+        
+        db.session.delete(user)
+        db.session.commit()
+
+        flash('Successfully deleted ' + user.username, category='success')
+        return redirect(url_for('views.manage_users'))
+
+@views.route('/users/edit', methods=['GET', 'POST'])
 @login_required
 def edit_user():
     if current_user.id == 1:
