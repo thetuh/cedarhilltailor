@@ -24,13 +24,13 @@ def create_order():
 
 # [ ADMIN ] ---
 
-@views.route('/manage-users', methods=['GET', 'POST'])
+@views.route('/users', methods=['GET', 'POST'])
 @login_required
 def manage_users():
     if current_user.id == 1:
         # Query all users except the admin user to prevent accidental deletion
         users = User.query.filter(User.id != 1).all()
-        return render_template('manage-users.html', users=users)
+        return render_template('users.html', users=users)
     else:
         flash('Unauthorized access', category='error')
         return redirect(url_for('views.home'))

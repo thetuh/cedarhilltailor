@@ -42,7 +42,7 @@
                   {% endif %}
                   <a class="nav-item nav-link" id="search-order" href="/search-order">Search order</a>
                   {% if current_user.id == 1 %}
-                      <a class="nav-item nav-link" id="manage-users" href="/manage-users">Manage users</a>
+                      <a class="nav-item nav-link" id="users" href="/users">Manage users</a>
                   {% endif %}
                   {% if current_user.is_authenticated %}
                       <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
