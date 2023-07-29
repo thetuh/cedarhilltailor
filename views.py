@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
 from application import db
@@ -36,11 +36,11 @@ def manage_users():
         flash('Unauthorized access', category='error')
         return redirect(url_for('views.home'))
 
-@views.route('/users/delete')
+@views.route('/users/delete/<id>')
 @login_required
-def delete_user():
+def delete_user(id):
     if current_user.id == 1:
-        user = User.query.get(request.form.get('id'))
+        user = User.query.get(id)
         if not user:
             flash('User not found', category='error')
             return redirect(url_for('views.manage_users'))
@@ -48,7 +48,7 @@ def delete_user():
         db.session.delete(user)
         db.session.commit()
 
-        flash('Successfully deleted ' + user.username, category='success')
+        flash("Successfully deleted '" + user.username + "'", category='success')
         return redirect(url_for('views.manage_users'))
 
 @views.route('/users/edit', methods=['GET', 'POST'])
@@ -85,7 +85,7 @@ def edit_user():
             user.password = generate_password_hash(password, method='sha256')
             db.session.commit()
 
-            flash('Successfully updated ' + user.username, category='success')
+            flash("Successfully updated '" + user.username + "'", category='success')
             return redirect(url_for('views.manage_users'))
     else:
         flash('Unauthorized access', category='error')
