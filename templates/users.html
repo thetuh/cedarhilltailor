@@ -19,7 +19,7 @@
             <tr>
                 <td>{{ user.username }}</td>
                 <td width="50%">
-                    <a href="/users/edit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modaledit{{user.id}}">Edit</a>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{user.id}}">Edit</button>
                     <a href="/users/delete/{{ user.id }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete `{{ user.username }}`?')">Delete</a>
                 </td>
             </tr>
@@ -56,8 +56,8 @@
 
 <br>
 <div id="wrapper">
-    <!-- Add data-bs-toggle and data-bs-target attributes to trigger the modal -->
-    <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalcreate">Create user</a>
+    <!-- Use a button element with type="button" to trigger the modal -->
+    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalcreate">Create user</button>
 </div>
 
 <div id="modalcreate" class="modal fade" role="dialog">

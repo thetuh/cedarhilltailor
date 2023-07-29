@@ -73,6 +73,12 @@ def create_user():
         if user:
             error.append("Username '" + username + ' already exists')
 
+        # Error message display
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
+            return redirect(url_for('views.manage_users'))
+
         new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
         db.session.add(new_user)
         db.session.commit()
