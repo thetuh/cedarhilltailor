@@ -4,3 +4,9 @@
     padding: 2rem;
     border-radius: 10px;
 }
+
+#wrapper
+{
+    display: flex;
+    justify-content: center;
+}

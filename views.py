@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 
+from models import User
+
 views = Blueprint('views', __name__)
 
 # [ GUEST ] ---
@@ -26,7 +28,9 @@ def create_order():
 @login_required
 def manage_users():
     if current_user.id == 1:
-        return render_template('manage-users.html')
+        # Query all users except the admin user to prevent accidental deletion
+        users = User.query.filter(User.id != 1).all()
+        return render_template('manage-users.html', users=users)
     else:
         flash('Unauthorized access', category='error')
         return redirect(url_for('views.home'))
