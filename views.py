@@ -86,6 +86,7 @@ def create_user():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        role_name = request.form.get('role')
 
         error = []
 
@@ -105,7 +106,13 @@ def create_user():
             flash(error_message, category='error')
             return redirect(url_for('views.manage_users'))
 
+        role = Role.query.filter_by(name=role_name).first()
+        if not role:
+            flash('Invalid role', category='error')
+            return redirect(url_for('views.create_user'))
+
         new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
+        new_user.roles = [role]
         db.session.add(new_user)
         db.session.commit()
 
@@ -134,8 +141,6 @@ def edit_user():
         # Sanity checks
         if not username:
             error.append('Please enter a valid username')
-        elif not password:
-            error.append('Please enter a valid password')
 
         # Error message display
         if error:
@@ -145,7 +150,9 @@ def edit_user():
 
         # Update the user object with new data
         user.username = username
-        user.password = generate_password_hash(password, method='sha256')
+
+        if password:
+            user.password = generate_password_hash(password, method='sha256')
 
         # Update the user's role
         role = Role.query.filter_by(name=role_name).first()

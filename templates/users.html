@@ -39,7 +39,7 @@
                                     <input type="hidden" name="id" value="{{user.id}}">
                                     <input type="username" class="form-control" name="username" value="{{user.username}}">
                                     <br>
-                                    <label>Password:</label>
+                                    <label>Password: (Leave blank if no change)</label>
                                     <input type="password" class="form-control" name="password">
                                     <br>
                                     <label>Role:</label>
@@ -91,7 +91,7 @@
                         <label>Role:</label>
                         <select class="form-control" name="role">
                             {% for role in available_roles %}
-                            <option value="{{ role }}">{{ role.name }}</option>
+                            <option value="{{ role.name }}">{{ role.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
