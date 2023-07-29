@@ -50,6 +50,38 @@ def delete_user(id):
 
         flash("Successfully deleted '" + user.username + "'", category='success')
         return redirect(url_for('views.manage_users'))
+    else:
+        flash('Unauthorized access', category='error')
+        return redirect(url_for('views.home'))
+
+@views.route('/users/create', methods=['GET', 'POST'])
+@login_required
+def create_user():
+    if current_user.id == 1:
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        error = []
+
+        # Sanity checks
+        if len(username) < 1:
+            error.append('Please enter valid username')
+        elif len(password) < 1:
+            error.append('Please enter valid password')
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            error.append("Username '" + username + ' already exists')
+
+        new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("Successfully added '" + username + "'", category='success')
+        return redirect(url_for('views.manage_users')) 
+    else:
+        flash('Unauthorized access', category='error')
+        return redirect(url_for('views.home'))
 
 @views.route('/users/edit', methods=['GET', 'POST'])
 @login_required

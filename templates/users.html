@@ -56,7 +56,33 @@
 
 <br>
 <div id="wrapper">
-    <a href="/users/create" class="btn btn-success">Create user</a>
+    <!-- Add data-bs-toggle and data-bs-target attributes to trigger the modal -->
+    <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalcreate">Create user</a>
+</div>
+
+<div id="modalcreate" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create user</h4>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for('views.create_user')}}" method="POST">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="username" class="form-control" name="username">
+                        <br>
+                        <label>Password:</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                    <div id="wrapper">
+                        <button class="btn btn-primary mt-4" type="submit">Confirm</button>
+                        <button type="button" class="btn btn-secondary mt-4 ms-3" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>                                                                  
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Bootstrap CSS -->
