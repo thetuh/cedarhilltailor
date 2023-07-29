@@ -6,7 +6,7 @@
 {% if current_user.is_authenticated %}
     <h1 align="center">Hi, {{ current_user.username }}!</h1>
     <br>
-    {% if current_user.id == 1 %}
+    {% if has_role(current_user, 'admin') %}
         <div class="dashboard--container">
             <h3>Dashboard</h3>
         </div>

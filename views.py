@@ -1,21 +1,20 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, Flask, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
-from application import db
-from models import User
+from application import db, application
+from models import User, Role
 
 views = Blueprint('views', __name__)
 
-# Custom decorator for authorization
-def admin_required(func):
-    def decorated_func(*args, **kwargs):
-        if current_user.id == 1:
-            return func(*args, **kwargs)
-        else:
-            flash('Unauthorized access', category='error')
-            return redirect(url_for('views.home'))
-    decorated_func.__name__ = func.__name__  # Preserve the original function name
-    return decorated_func
+def has_role(user, role_name):
+    if user.is_anonymous:
+        return False
+    return any(role.name == role_name for role in user.roles)
+
+# Register the has_role function as a global function
+@application.context_processor
+def inject_has_role():
+    return dict(has_role=has_role)
 
 # [ GUEST ] ---
 
@@ -29,19 +28,41 @@ def search_order():
 
 # [ MANAGER ] ---
 
+def manager_required(func):
+    def decorated_func(*args, **kwargs):
+        if any(role.name == 'manager' or role.name == 'admin' for role in current_user.roles):
+            return func(*args, **kwargs)
+        else:
+            flash('Unauthorized access', category='error')
+            return redirect(url_for('views.home'))
+    decorated_func.__name__ = func.__name__  # Preserve the original function name
+    return decorated_func
+
 @views.route('/create-order')
 @login_required
+@manager_required
 def create_order():
     return render_template('create-order.html')
 
 # [ ADMIN ] ---
 
+def admin_required(func):
+    def decorated_func(*args, **kwargs):
+        if any(role.name == 'admin' for role in current_user.roles):
+            return func(*args, **kwargs)
+        else:
+            flash('Unauthorized access', category='error')
+            return redirect(url_for('views.home'))
+    decorated_func.__name__ = func.__name__  # Preserve the original function name
+    return decorated_func
+
 @views.route('/users')
 @login_required
 @admin_required
 def manage_users():
-    users = User.query.filter(User.id != 1).all()
-    return render_template('users.html', users=users)
+    users = User.query.filter(~User.roles.any(name='admin')).all()
+    available_roles = Role.query.all()
+    return render_template('users.html', users=users, available_roles=available_roles)
 
 @views.route('/users/delete/<int:id>')
 @login_required
@@ -114,8 +135,6 @@ def edit_user():
             error.append('Please enter a valid username')
         if not password:
             error.append('Please enter a valid password')
-        elif check_password_hash(user.password, password):
-            error.append('Password is already in use')
 
         # Error message display
         if error:

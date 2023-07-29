@@ -30,3 +30,6 @@ login_manager.init_app(application)
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+def has_role(user, role_name):
+    return any(role.name == role_name for role in user.roles)

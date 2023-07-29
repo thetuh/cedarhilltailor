@@ -1,10 +1,25 @@
 from application import db
 from flask_login import UserMixin
 
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(255))
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    
+    # Define the many-to-many relationship with roles
+    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy=True))
+
+# Association table for the many-to-many relationship between users and roles
+user_roles = db.Table(
+    'user_roles',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
+)
 
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
