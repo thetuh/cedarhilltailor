@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
 from application import db, application
-from models import User, Role
+from models import User, Role, user_roles
+from sqlalchemy import desc
 
 views = Blueprint('views', __name__)
 
@@ -60,7 +61,12 @@ def admin_required(func):
 @login_required
 @admin_required
 def manage_users():
-    users = User.query.filter(~User.roles.any(name='admin')).all()
+    users = User.query \
+        .join(user_roles) \
+        .join(Role) \
+        .filter(Role.name != 'admin') \
+        .order_by(Role.id) \
+        .all()
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
