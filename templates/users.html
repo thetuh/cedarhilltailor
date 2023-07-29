@@ -46,9 +46,9 @@
                                     <select class="form-control" name="role">
                                         {% for role in available_roles %}
                                             {% if user.roles[0] == role %}
-                                                <option value="{{ role }}" selected>{{ role.name }}</option>
+                                                <option value="{{ role.name }}" selected>{{ role.name }}</option>
                                             {% else %}
-                                                <option value="{{ role }}">{{ role.name }}</option>
+                                                <option value="{{ role.name }}">{{ role.name }}</option>
                                             {% endif %}
                                         {% endfor %}
                                     </select>
@@ -87,6 +87,13 @@
                         <br>
                         <label>Password:</label>
                         <input type="password" class="form-control" name="password">
+                        <br>
+                        <label>Role:</label>
+                        <select class="form-control" name="role">
+                            {% for role in available_roles %}
+                            <option value="{{ role }}">{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div id="wrapper">
                         <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>

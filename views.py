@@ -127,13 +127,14 @@ def edit_user():
 
         username = request.form.get('username')
         password = request.form.get('password')
+        role_name = request.form.get('role')
 
         error = []
 
         # Sanity checks
         if not username:
             error.append('Please enter a valid username')
-        if not password:
+        elif not password:
             error.append('Please enter a valid password')
 
         # Error message display
@@ -145,6 +146,15 @@ def edit_user():
         # Update the user object with new data
         user.username = username
         user.password = generate_password_hash(password, method='sha256')
+
+        # Update the user's role
+        role = Role.query.filter_by(name=role_name).first()
+        if not role:
+            flash('Invalid role', category='error')
+            return redirect(url_for('views.manage_users'))
+
+        user.roles = [role]
+        
         db.session.commit()
 
         flash(f"Successfully updated '{user.username}'", category='success')
