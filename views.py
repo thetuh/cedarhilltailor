@@ -6,6 +6,17 @@ from models import User
 
 views = Blueprint('views', __name__)
 
+# Custom decorator for authorization
+def admin_required(func):
+    def decorated_func(*args, **kwargs):
+        if current_user.id == 1:
+            return func(*args, **kwargs)
+        else:
+            flash('Unauthorized access', category='error')
+            return redirect(url_for('views.home'))
+    decorated_func.__name__ = func.__name__  # Preserve the original function name
+    return decorated_func
+
 # [ GUEST ] ---
 
 @views.route('/')
@@ -27,51 +38,45 @@ def create_order():
 
 @views.route('/users')
 @login_required
+@admin_required
 def manage_users():
-    if current_user.id == 1:
-        # Query all users except the admin user to prevent accidental deletion
-        users = User.query.filter(User.id != 1).all()
-        return render_template('users.html', users=users)
-    else:
-        flash('Unauthorized access', category='error')
-        return redirect(url_for('views.home'))
+    users = User.query.filter(User.id != 1).all()
+    return render_template('users.html', users=users)
 
-@views.route('/users/delete/<id>')
+@views.route('/users/delete/<int:id>')
 @login_required
+@admin_required
 def delete_user(id):
-    if current_user.id == 1:
-        user = User.query.get(id)
-        if not user:
-            flash('User not found', category='error')
-            return redirect(url_for('views.manage_users'))
-        
-        db.session.delete(user)
-        db.session.commit()
-
-        flash("Successfully deleted '" + user.username + "'", category='success')
+    user = User.query.get(id)
+    if not user:
+        flash('User not found', category='error')
         return redirect(url_for('views.manage_users'))
-    else:
-        flash('Unauthorized access', category='error')
-        return redirect(url_for('views.home'))
+
+    db.session.delete(user)
+    db.session.commit()
+
+    flash(f"Successfully deleted '{user.username}'", category='success')
+    return redirect(url_for('views.manage_users'))
 
 @views.route('/users/create', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def create_user():
-    if current_user.id == 1:
+    if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
         error = []
 
         # Sanity checks
-        if len(username) < 1:
-            error.append('Please enter valid username')
-        elif len(password) < 1:
-            error.append('Please enter valid password')
+        if not username:
+            error.append('Please enter a valid username')
+        elif not password:
+            error.append('Please enter a valid password')
 
         user = User.query.filter_by(username=username).first()
         if user:
-            error.append("Username '" + username + ' already exists')
+            error.append(f"Username '{username}' already exists")
 
         # Error message display
         if error:
@@ -83,48 +88,47 @@ def create_user():
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Successfully added '" + username + "'", category='success')
+        flash(f"Successfully added '{username}'", category='success')
         return redirect(url_for('views.manage_users')) 
-    else:
-        flash('Unauthorized access', category='error')
-        return redirect(url_for('views.home'))
+
+    return render_template('create-user.html')
 
 @views.route('/users/edit', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def edit_user():
-    if current_user.id == 1:
-        if request.method == 'POST':
-            user = User.query.get(request.form.get('id'))
-            if not user:
-                flash('User not found', category='error')
-                return redirect(url_for('views.manage_users'))
-
-            username = request.form.get('username')
-            password = request.form.get('password')
-
-            error = []
-
-            # Sanity checks
-            if len(username) < 1:
-                error.append('Please enter valid username')
-            elif len(password) < 1:
-                error.append('Please enter valid password')
-            elif check_password_hash(user.password, password):
-                error.append('Password is already in use')
-
-            # Error message display
-            if error:
-                error_message = ' '.join(error)
-                flash(error_message, category='error')
-                return redirect(url_for('views.manage_users'))
-
-            # Update the user object with new data
-            user.username = username
-            user.password = generate_password_hash(password, method='sha256')
-            db.session.commit()
-
-            flash("Successfully updated '" + user.username + "'", category='success')
+    if request.method == 'POST':
+        user_id = request.form.get('id')
+        user = User.query.get(user_id)
+        if not user:
+            flash('User not found', category='error')
             return redirect(url_for('views.manage_users'))
-    else:
-        flash('Unauthorized access', category='error')
-        return redirect(url_for('views.home'))
+
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        error = []
+
+        # Sanity checks
+        if not username:
+            error.append('Please enter a valid username')
+        if not password:
+            error.append('Please enter a valid password')
+        elif check_password_hash(user.password, password):
+            error.append('Password is already in use')
+
+        # Error message display
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
+            return redirect(url_for('views.manage_users'))
+
+        # Update the user object with new data
+        user.username = username
+        user.password = generate_password_hash(password, method='sha256')
+        db.session.commit()
+
+        flash(f"Successfully updated '{user.username}'", category='success')
+        return redirect(url_for('views.manage_users'))
+
+    return render_template('edit-user.html')

@@ -1,6 +1,6 @@
 from models import User
 from flask import Blueprint, request, render_template, flash, redirect, url_for, session
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from alert import email_alert
 
@@ -12,17 +12,17 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        error = []
+        errors = []
 
-        # Sanity checks
-        if len(username) < 1:
-            error.append('Please enter username')
-        elif len(password) < 1:
-            error.append('Please enter password')
+        # Input Validation
+        if not username:
+            errors.append('Please enter a username')
+        elif not password:
+            errors.append('Please enter a password')
 
         # Error message display
-        if error:
-            error_message = ' '.join(error)
+        if errors:
+            error_message = ' '.join(errors)
             flash(error_message, category='error')
             return render_template('login.html')
 
@@ -36,7 +36,6 @@ def login():
             return redirect(url_for('views.home'))
         else:
             flash('Invalid login', category='error')
-
 
     return render_template('login.html')
 
