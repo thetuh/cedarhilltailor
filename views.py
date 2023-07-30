@@ -1,21 +1,12 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Flask, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
-from application import db, application
-from models import User, Role
+from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
+from models import User, Role
+from application import db
 
 views = Blueprint('views', __name__)
-
-def has_role(user, role_name):
-    if user.is_anonymous:
-        return False
-    return user.role.name == role_name
-
-# Register the has_role function as a global function
-@application.context_processor
-def inject_has_role():
-    return dict(has_role=has_role)
 
 # [ GUEST ] ---
 
@@ -29,16 +20,6 @@ def search_order():
 
 # [ MANAGER ] ---
 
-def manager_required(func):
-    def decorated_func(*args, **kwargs):
-        if current_user.role.name == 'admin' or current_user.role.name == 'manager':
-            return func(*args, **kwargs)
-        else:
-            flash('Unauthorized access', category='error')
-            return redirect(url_for('views.home'))
-    decorated_func.__name__ = func.__name__  # Preserve the original function name
-    return decorated_func
-
 @views.route('/create-order')
 @login_required
 @manager_required
@@ -46,16 +27,6 @@ def create_order():
     return render_template('create-order.html')
 
 # [ ADMIN ] ---
-
-def admin_required(func):
-    def decorated_func(*args, **kwargs):
-        if current_user.role.name == 'admin':
-            return func(*args, **kwargs)
-        else:
-            flash('Unauthorized access', category='error')
-            return redirect(url_for('views.home'))
-    decorated_func.__name__ = func.__name__  # Preserve the original function name
-    return decorated_func
 
 @views.route('/users')
 @login_required
