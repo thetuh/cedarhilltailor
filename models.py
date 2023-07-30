@@ -41,7 +41,6 @@ class Order(db.Model):
 class Garment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     garment_name = db.Column(db.String(100))
-    price = db.Column(db.DECIMAL(10, 2), nullable=False, index=True)
 
     # Define the one-to-many relationship with jobs
     jobs = db.relationship('Job', backref='garment', lazy=True)
@@ -54,5 +53,5 @@ class OrderItem(db.Model):
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     garment_id = db.Column(db.Integer, db.ForeignKey('garment.id'), nullable=False, index=True)
+    price = db.Column(db.DECIMAL(10, 2), nullable=False, index=True)
     job_name = db.Column(db.String(100))
-
