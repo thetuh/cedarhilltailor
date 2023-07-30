@@ -61,7 +61,7 @@ def admin_required(func):
 @login_required
 @admin_required
 def manage_users():
-    users = User.query.filter(not_(User.role_id == 1)).all()
+    users = User.query.filter(not_(User.role_id == 1)).order_by(User.role_id.asc()).all()
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
@@ -112,8 +112,7 @@ def create_user():
             flash('Invalid role', category='error')
             return redirect(url_for('views.create_user'))
 
-        new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
-        new_user.roles = [role]
+        new_user = User(username=username, password=generate_password_hash(password, method='sha256'), role_id=role.id)
         db.session.add(new_user)
         db.session.commit()
 
@@ -161,8 +160,7 @@ def edit_user():
             flash('Invalid role', category='error')
             return redirect(url_for('views.manage_users'))
 
-        user.roles = [role]
-        
+        user.role_id = role.id        
         db.session.commit()
 
         flash(f"Successfully updated '{user.username}'", category='success')
