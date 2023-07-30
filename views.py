@@ -2,15 +2,15 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
 from application import db, application
-from models import User, Role, user_roles
-from sqlalchemy import desc
+from models import User, Role
+from sqlalchemy import desc, not_
 
 views = Blueprint('views', __name__)
 
 def has_role(user, role_name):
     if user.is_anonymous:
         return False
-    return any(role.name == role_name for role in user.roles)
+    return user.role.name == role_name
 
 # Register the has_role function as a global function
 @application.context_processor
@@ -31,7 +31,7 @@ def search_order():
 
 def manager_required(func):
     def decorated_func(*args, **kwargs):
-        if any(role.name == 'manager' or role.name == 'admin' for role in current_user.roles):
+        if current_user.role.name == 'admin' or current_user.role.name == 'manager':
             return func(*args, **kwargs)
         else:
             flash('Unauthorized access', category='error')
@@ -49,7 +49,7 @@ def create_order():
 
 def admin_required(func):
     def decorated_func(*args, **kwargs):
-        if any(role.name == 'admin' for role in current_user.roles):
+        if current_user.role.name == 'admin':
             return func(*args, **kwargs)
         else:
             flash('Unauthorized access', category='error')
@@ -61,12 +61,7 @@ def admin_required(func):
 @login_required
 @admin_required
 def manage_users():
-    users = User.query \
-        .join(user_roles) \
-        .join(Role) \
-        .filter(Role.name != 'admin') \
-        .order_by(Role.id) \
-        .all()
+    users = User.query.filter(not_(User.role_id == 1)).all()
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
