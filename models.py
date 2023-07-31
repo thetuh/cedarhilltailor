@@ -16,6 +16,13 @@ class User(db.Model, UserMixin):
     # FK (Role)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False, index=True)
 
+# Association table for the many-to-many relationship between orders and garments
+order_garment_association = db.Table(
+    'order_garment_association',
+    db.Column('order_id', db.Integer, db.ForeignKey('order.id'), primary_key=True),
+    db.Column('garment_id', db.Integer, db.ForeignKey('garment.id'), primary_key=True)
+)
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_name = db.Column(db.String(150), index=True)
@@ -24,15 +31,15 @@ class Order(db.Model):
     order_date = db.Column(db.Date, index=True)
     completion_date = db.Column(db.Date, index=True)
 
-    # one-to-many (Garment)
-    garments = db.relationship('Garment', backref='order', lazy=True)
+    # many-to-many (Garment)
+    garments = db.relationship('Garment', secondary=order_garment_association, backref='orders', lazy=True)
 
 class Garment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     garment_name = db.Column(db.String(100))
 
-    # FK (Order)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False, index=True)
+    # many-to-many (Order)
+    orders = db.relationship('Order', secondary=order_garment_association, backref='garments', lazy=True)
 
     # one-to-many (Job)
     jobs = db.relationship('Job', backref='garment', lazy=True)
