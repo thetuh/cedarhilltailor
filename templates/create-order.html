@@ -100,9 +100,7 @@ function BtnAdd() {
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
   rows.forEach((row, index) => {
-    if (index > 0) {
       row.querySelector(".btn-delete").style.display = "inline-block";
-    }
   });
 }
 
