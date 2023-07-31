@@ -57,6 +57,7 @@
             <tr>
               <th scope="col">Garment</th>
               <th scope="col">Job(s)</th>
+              <th scope="col">Description</th>
               <th scope="col" class="col-1"></th>
             </tr>
           </thead>
@@ -75,6 +76,9 @@
                     <option value="{{ job.job_name }}">{{ job.job_name }}</option>
                   {% endfor %}
                 </select>
+              </td>
+              <td>
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
               </td>
               <td class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
             </tr>
