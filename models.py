@@ -16,21 +16,11 @@ class User(db.Model, UserMixin):
     # FK (Role)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False, index=True)
 
-class Customer(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), index=True)
-    email = db.Column(db.String(150), unique=True)
-    phone_number = db.Column(db.String(20), index=True)
-
-    # one-to-many (Order)
-    orders = db.relationship('Order', backref='customer', lazy=True)
-
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    customer_name = db.Column(db.String(150), index=True)
+    customer_phone_number = db.Column(db.String(20), index=True)
     order_date = db.Column(db.Date, index=True)
-
-    # FK (Customer)
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False, index=True)
 
     # one-to-many (Garment)
     garments = db.relationship('Garment', backref='order', lazy=True)
