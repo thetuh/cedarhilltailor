@@ -69,7 +69,13 @@
                   {% endfor %}
                 </select>
               </td>
-              <td>Otto</td>
+              <td>
+                <select class="custom-select">
+                  {% for job in available_jobs %}
+                    <option value="{{ job.job_name }}">{{ job.job_name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
               <td class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
             </tr>
           </tbody>

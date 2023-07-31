@@ -25,7 +25,7 @@ def search_order():
 @manager_required
 def create_order():
     available_garments = GarmName.query.order_by(GarmName.garment_name).all()
-    available_jobs = JobName.query.all()
+    available_jobs = JobName.query.order_by(JobName.job_name).all()
     return render_template('create-order.html', available_garments=available_garments, available_jobs=available_jobs)
 
 # [ ADMIN ] ---
