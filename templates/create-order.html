@@ -56,34 +56,28 @@
           <thead class="thead-light">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
+              <th scope="col">Garment</th>
+              <th scope="col">Job(s)</th>
+              <th scope="col" class="col-1"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
+          <tbody id="TBody">
+            <tr id="TRow">
               <th scope="row">1</th>
-              <td>Mark</td>
+              <td>
+                <select class="custom-select">
+                  <option value="1">One</option>
+                  <option value="2">Two</option>
+                  <option value="3">Three</option>
+                </select>
+              </td>
               <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
+              <td class="NoPrint"><button type="button" class="btn btn-sm btn-danger" onclick="BtnDel(this)">X</button></td>
             </tr>
           </tbody>
         </table>
         <div id="wrapper">
-        <button type="button" class="btn btn-dark">Add garment</button>
+        <button type="button" class="btn btn-dark" onclick="BtnAdd()">Add garment</button>
         </div>
         <label for="basic-url">Completion date</label>
         <div class="md-form md-outline input-with-post-icon datepicker">
@@ -92,5 +86,27 @@
       </div>
   </div>
 </div>
+
+<script>
+function BtnAdd()
+{
+    var v = $("#TRow").clone().appendTo("#TBody") ;
+    $(v).find("input").val('');
+    $(v).find("th").first().html($('#TBody tr').length);
+}
+function BtnDel(v)
+{
+    $(v).parent().parent().remove(); 
+    GetTotal();
+
+    $("#TBody").find("tr").each(
+    function(index)
+    {
+        $(this).find("th").first().html(index);
+    }
+
+    );
+}
+</script>
 
 {% endblock %}

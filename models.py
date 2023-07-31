@@ -16,13 +16,6 @@ class User(db.Model, UserMixin):
     # FK (Role)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False, index=True)
 
-# Association table for the many-to-many relationship between orders and garments
-order_garment_association = db.Table(
-    'order_garment_association',
-    db.Column('order_id', db.Integer, db.ForeignKey('order.id'), primary_key=True),
-    db.Column('garment_id', db.Integer, db.ForeignKey('garment.id'), primary_key=True)
-)
-
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_name = db.Column(db.String(150), index=True)
@@ -31,15 +24,33 @@ class Order(db.Model):
     order_date = db.Column(db.Date, index=True)
     completion_date = db.Column(db.Date, index=True)
 
-    # many-to-many (Garment)
-    garments = db.relationship('Garment', secondary=order_garment_association, backref='orders', lazy=True)
+    # one-to-many (Garment)
+    garments = db.relationship('Garment', backref='order', lazy=True)
 
-class Garment(db.Model):
+class GarmName(db.Model):
+    __tablename__ = 'garmname'  # Add this line to explicitly set the table name
     id = db.Column(db.Integer, primary_key=True)
     garment_name = db.Column(db.String(100))
 
-    # many-to-many (Order)
-    orders = db.relationship('Order', secondary=order_garment_association, backref='garments', lazy=True)
+    # one-to-many (Garment)
+    g_garments = db.relationship('Garment', backref='garmname', lazy=True)
+
+class JobName(db.Model):
+    __tablename__ = 'jobname'  # Add this line to explicitly set the table name
+    id = db.Column(db.Integer, primary_key=True)
+    job_name = db.Column(db.String(100))
+
+    # one-to-many (Job)
+    j_jobs = db.relationship('Job', backref='jobname', lazy=True) 
+
+class Garment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    # FK (GarmName)
+    garm_name_id = db.Column(db.Integer, db.ForeignKey('garmname.id'), nullable=False)
+
+    # FK (Order)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False, index=True)
 
     # one-to-many (Job)
     jobs = db.relationship('Job', backref='garment', lazy=True)
@@ -47,7 +58,9 @@ class Garment(db.Model):
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     price = db.Column(db.DECIMAL(10, 2), nullable=False, index=True)
-    job_name = db.Column(db.String(100))
+
+    # FK (GarmentItem)
+    job_name_id = db.Column(db.Integer, db.ForeignKey('jobname.id'), nullable=False)
 
     # FK (Garment)
     garment_id = db.Column(db.Integer, db.ForeignKey('garment.id'), nullable=False, index=True)
