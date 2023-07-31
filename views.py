@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
-from models import User, Role
+from models import User, Role, GarmName, JobName
 from application import db
 
 views = Blueprint('views', __name__)
@@ -24,7 +24,9 @@ def search_order():
 @login_required
 @manager_required
 def create_order():
-    return render_template('create-order.html')
+    available_garments = GarmName.query.order_by(GarmName.garment_name).all()
+    available_jobs = JobName.query.all()
+    return render_template('create-order.html', available_garments=available_garments, available_jobs=available_jobs)
 
 # [ ADMIN ] ---
 

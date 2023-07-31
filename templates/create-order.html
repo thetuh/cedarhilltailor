@@ -64,13 +64,13 @@
             <tr id="TRow">
               <td>
                 <select class="custom-select">
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  {% for garment in available_garments %}
+                    <option value="{{ garment.garment_name }}">{{ garment.garment_name }}</option>
+                  {% endfor %}
                 </select>
               </td>
               <td>Otto</td>
-              <td class="NoPrint"><button type="button" class="btn btn-sm btn-danger" onclick="BtnDel(this)">X</button></td>
+              <td class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
             </tr>
           </tbody>
         </table>
@@ -86,25 +86,55 @@
 </div>
 
 <script>
-function BtnAdd()
-{
-    var v = $("#TRow").clone().appendTo("#TBody") ;
-    $(v).find("input").val('');
-    $(v).find("th").first().html($('#TBody tr').length);
-}
-function BtnDel(v)
-{
-    $(v).parent().parent().remove(); 
-    GetTotal();
+// Function to handle adding a new row
+function BtnAdd() {
+  // Clone the first row
+  const newRow = document.getElementById("TRow").cloneNode(true);
 
-    $("#TBody").find("tr").each(
-    function(index)
-    {
-        $(this).find("th").first().html(index);
+  // Clear the selection in the cloned row
+  newRow.querySelector("select").selectedIndex = 0;
+
+  // Append the new row to the table body
+  document.getElementById("TBody").appendChild(newRow);
+
+  // Show the "X" button in all rows except the first one
+  const rows = document.querySelectorAll("#TBody tr");
+  rows.forEach((row, index) => {
+    if (index > 0) {
+      row.querySelector(".btn-delete").style.display = "inline-block";
     }
-
-    );
+  });
 }
+
+// Function to handle deleting a row
+function BtnDel(button) {
+  // Get the table row containing the button
+  const row = button.parentNode.parentNode;
+
+  // Remove the row from the table body
+  row.remove();
+
+  // Hide the "X" button in the last row if there's only one row left
+  const rows = document.querySelectorAll("#TBody tr");
+  if (rows.length === 1) {
+    rows[0].querySelector(".btn-delete").style.display = "none";
+  }
+}
+
+// Get the input element
+const inputElement = document.getElementById("example");
+
+// Get today's date and format it as 'YYYY-MM-DD'
+const today = new Date().toISOString().split("T")[0];
+
+// Set the 'min' attribute of the input element to today's date
+inputElement.setAttribute("min", today);
+
+  // Hide the "X" button in the last row if there's only one row left
+  const rows = document.querySelectorAll("#TBody tr");
+  if (rows.length === 1) {
+    rows[0].querySelector(".btn-delete").style.display = "none";
+  }
 </script>
 
 {% endblock %}
