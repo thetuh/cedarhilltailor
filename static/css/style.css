@@ -10,3 +10,19 @@
     display: flex;
     justify-content: center;
 }
+
+#phone:focus:valid {
+    border-color: green;
+}
+
+#phone:focus:invalid {
+    border-color: red;
+}
+
+#name:focus:valid{
+    border-color: green;
+}
+
+#name:focus:invalid{
+    border-color: red;
+}
