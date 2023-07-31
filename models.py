@@ -20,7 +20,9 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_name = db.Column(db.String(150), index=True)
     customer_phone_number = db.Column(db.String(20), index=True)
+
     order_date = db.Column(db.Date, index=True)
+    completion_date = db.Column(db.Date, index=True)
 
     # one-to-many (Garment)
     garments = db.relationship('Garment', backref='order', lazy=True)
