@@ -21,14 +21,16 @@
                         <input type="text" class="form-control" id="name" name="first-name" required pattern="[A-Za-z]{1,32}" aria-label="FirstName" placeholder="e.g. John" aria-describedby="basic-addon1">
                     </div>
                 </div>
-                <div class="col">
-                    <div class="input-group input-group-sm mb-3">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text" id="basic-addon1">Last name</span>
-                        </div>
-                        <input type="text" class="form-control" id="name" name="last-name" required pattern="[A-Za-z]{1,32}" aria-label="LastName" placeholder="e.g. Smith" aria-describedby="basic-addon1">
+            </div>
+            <div class="form-row">
+              <div class="col">
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Last name</span>
                     </div>
+                    <input type="text" class="form-control" id="name" name="last-name" required pattern="[A-Za-z]{1,32}" aria-label="LastName" placeholder="e.g. Smith" aria-describedby="basic-addon1">
                 </div>
+            </div>
             </div>
             <div class="form-row">
               <div class="col">
@@ -64,16 +66,16 @@
             <tr id="TRow">
               <td>
                 <label for="basic-url">Garment</label>
-                <select class="custom-select garmentSelect">
+                <select class="custom-select custom-select-sm garmentSelect">
                   <option selected disabled></option>
                   {% for garment in available_garments %}
                     <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
-                </select>                
+                </select>
                 <br>
                 <br>
                 <label for="basic-url">Jobs</label>
-                <select class="custom-select jobSelect" multiple>
+                <select class="custom-select custom-select-sm jobSelect" multiple>
                   <option selected disabled></option>
                 </select>            
               </td>        
