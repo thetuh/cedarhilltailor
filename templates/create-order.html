@@ -73,7 +73,7 @@
                 <br>
                 <br>
                 <label for="basic-url">Jobs</label>
-                <select class="custom-select jobSelect">
+                <select class="custom-select jobSelect" multiple>
                   <option selected disabled></option>
                 </select>            
               </td>        
@@ -137,6 +137,12 @@ window.addEventListener("DOMContentLoaded", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
   });
 });
+
+  // Hide the "X" button in the last row if there's only one row left
+  const rows = document.querySelectorAll("#TBody tr");
+  if (rows.length === 1) {
+    rows[0].querySelector(".btn-delete").style.display = "none";
+  }
 
 // Function to handle deleting a row
 function BtnDel(button) {
@@ -212,7 +218,6 @@ function fetchJobsForGarment(selectElement, jobSelect) {
       console.error('Error fetching jobs:', error);
     });
 }
-
 
 </script>
 {% endblock %}
