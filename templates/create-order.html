@@ -64,18 +64,18 @@
             <tr id="TRow">
               <td>
                 <label for="basic-url">Garment</label>
-                <select class="custom-select" id="garmentSelect">
+                <select class="custom-select garmentSelect">
                   <option selected disabled></option>
                   {% for garment in available_garments %}
                     <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
-                </select>
+                </select>                
                 <br>
                 <br>
                 <label for="basic-url">Jobs</label>
-                <select class="custom-select" id="jobSelect">
+                <select class="custom-select jobSelect">
                   <option selected disabled></option>
-                </select>              
+                </select>            
               </td>        
               <td>
                 <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
@@ -97,23 +97,46 @@
 </div>
 
 <script>
-// Function to handle adding a new row
+
 function BtnAdd() {
   // Clone the first row
   const newRow = document.getElementById("TRow").cloneNode(true);
 
   // Clear the selection in the cloned row
-  newRow.querySelector("select").selectedIndex = 0;
+  newRow.querySelector(".garmentSelect").selectedIndex = 0;
+  newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
 
+  // Get the corresponding garmentSelect and jobSelect elements in the cloned row
+  const garmentSelect = newRow.querySelector(".garmentSelect");
+  const jobSelect = newRow.querySelector(".jobSelect");
+
+  // Add an event listener to handle garment selection updates for dynamically added rows
+  if (!newRow.hasAttribute("data-event-listener-added")) {
+    newRow.setAttribute("data-event-listener-added", "true");
+    garmentSelect.addEventListener("change", function () {
+      fetchJobsForGarment(garmentSelect, jobSelect);
+    });
+  }
+
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
-  rows.forEach((row, index) => {
-      row.querySelector(".btn-delete").style.display = "inline-block";
+  rows.forEach((row) => {
+    row.querySelector(".btn-delete").style.display = "inline-block";
   });
 }
+
+// Attach the event listener to the first row when the page loads
+window.addEventListener("DOMContentLoaded", function () {
+  const firstRow = document.querySelector("#TBody tr");
+  const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
+  const firstRowJobSelect = firstRow.querySelector(".jobSelect");
+  firstRowGarmentSelect.addEventListener("change", function () {
+    fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
+  });
+});
 
 // Function to handle deleting a row
 function BtnDel(button) {
@@ -138,12 +161,6 @@ const today = new Date().toISOString().split("T")[0];
 
 // Set the 'min' attribute of the input element to today's date
 inputElement.setAttribute("min", today);
-
-// Hide the "X" button in the last row if there's only one row left
-const rows = document.querySelectorAll("#TBody tr");
-if (rows.length === 1) {
-  rows[0].querySelector(".btn-delete").style.display = "none";
-}
 
 const phoneInput = document.getElementById('phone');
 
@@ -171,43 +188,31 @@ nameInput.addEventListener('input', function() {
   nameInput.value = cleanedValue;
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-      const garmentSelect = document.getElementById("garmentSelect");
-      const jobSelect = document.getElementById("jobSelect");
+function fetchJobsForGarment(selectElement, jobSelect) {
+  const garmentId = selectElement.value;
 
-      garmentSelect.addEventListener("change", function ()
-      {
-        const selectedGarmentId = garmentSelect.value;
-        fetchJobsForGarment(selectedGarmentId);
-      });
-
-      function fetchJobsForGarment(garmentId) {
-        // Use AJAX to fetch jobs for the selected garment
-        fetch(`/get_jobs_for_garment/${garmentId}`)
-          .then(response => response.json())
-          .then(data =>
-          {
-            // Remove all options from the job select dropdown
-            while (jobSelect.options.length > 0)
-            {
-              jobSelect.remove(0);
-            }
-
-            // Add job options for the selected garment to the job select dropdown
-            data.jobs.forEach(job =>
-            {
-              const option = document.createElement("option");
-              option.value = job.id;
-              option.text = job.name;
-              jobSelect.appendChild(option);
-            });
-          })
-          .catch(error =>
-          {
-            console.error('Error fetching jobs:', error);
-          });
+  // Use AJAX to fetch jobs for the selected garment
+  fetch(`/get_jobs_for_garment/${garmentId}`)
+    .then(response => response.json())
+    .then(data => {
+      // Remove all options from the job select dropdown of the current row
+      while (jobSelect.options.length > 0) {
+        jobSelect.remove(0);
       }
-});
+
+      // Add job options for the selected garment to the job select dropdown of the current row
+      data.jobs.forEach(job => {
+        const option = document.createElement("option");
+        option.value = job.id;
+        option.text = job.name;
+        jobSelect.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching jobs:', error);
+    });
+}
+
 
 </script>
 {% endblock %}
