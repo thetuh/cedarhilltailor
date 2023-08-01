@@ -55,8 +55,7 @@
         <table class="table table-bordered">
           <thead class="thead-light">
             <tr>
-              <th scope="col">Garment</th>
-              <th scope="col">Job(s) / Price</th>
+              <th scope="col">Item</th>
               <th scope="col">Description</th>
               <th scope="col" class="col-1"></th>
             </tr>
@@ -64,21 +63,20 @@
           <tbody id="TBody">
             <tr id="TRow">
               <td>
-                <select class="custom-select">
+                <label for="basic-url">Garment</label>
+                <select class="custom-select" id="garmentSelect">
                   <option selected disabled></option>
                   {% for garment in available_garments %}
-                    <option value="{{ garment.garment_name }}">{{ garment.garment_name }}</option>
+                    <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
                 </select>
-              </td>
-              <td>
-                <select class="custom-select">
+                <br>
+                <br>
+                <label for="basic-url">Jobs</label>
+                <select class="custom-select" id="jobSelect">
                   <option selected disabled></option>
-                  {% for job in available_jobs %}
-                    <option value="{{ job.job_name }}">{{ job.job_name }}</option>
-                  {% endfor %}
-                </select>
-              </td>
+                </select>              
+              </td>        
               <td>
                 <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
               </td>
@@ -171,6 +169,44 @@ const nameInput = document.getElementById('name');
 nameInput.addEventListener('input', function() {
   const cleanedValue = nameInput.value.replace(/[^A-Za-z]/g, '');
   nameInput.value = cleanedValue;
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+      const garmentSelect = document.getElementById("garmentSelect");
+      const jobSelect = document.getElementById("jobSelect");
+
+      garmentSelect.addEventListener("change", function ()
+      {
+        const selectedGarmentId = garmentSelect.value;
+        fetchJobsForGarment(selectedGarmentId);
+      });
+
+      function fetchJobsForGarment(garmentId) {
+        // Use AJAX to fetch jobs for the selected garment
+        fetch(`/get_jobs_for_garment/${garmentId}`)
+          .then(response => response.json())
+          .then(data =>
+          {
+            // Remove all options from the job select dropdown
+            while (jobSelect.options.length > 0)
+            {
+              jobSelect.remove(0);
+            }
+
+            // Add job options for the selected garment to the job select dropdown
+            data.jobs.forEach(job =>
+            {
+              const option = document.createElement("option");
+              option.value = job.id;
+              option.text = job.name;
+              jobSelect.appendChild(option);
+            });
+          })
+          .catch(error =>
+          {
+            console.error('Error fetching jobs:', error);
+          });
+      }
 });
 
 </script>

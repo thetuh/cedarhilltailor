@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, Flask, g
+from flask import Blueprint, render_template, request, flash, redirect, url_for, Flask, g, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
-from models import User, Role, GarmName, JobName
+from models import User, Role, Garment, Job
 from application import db
 
 views = Blueprint('views', __name__)
@@ -24,9 +24,19 @@ def search_order():
 @login_required
 @manager_required
 def create_order():
-    available_garments = GarmName.query.order_by(GarmName.garment_name).all()
-    available_jobs = JobName.query.order_by(JobName.job_name).all()
-    return render_template('create-order.html', available_garments=available_garments, available_jobs=available_jobs)
+    available_garments = Garment.query.all()
+    return render_template('create-order.html', available_garments=available_garments)
+
+@views.route('/get_jobs_for_garment/<int:garment_id>')
+@login_required
+@manager_required
+def get_jobs_for_garment(garment_id):
+    garment = Garment.query.get(garment_id)
+    if garment:
+        jobs = garment.jobs
+        return jsonify({"jobs": [{"id": job.id, "name": job.name} for job in jobs]})
+    else:
+        return jsonify({"jobs": []})
 
 # [ ADMIN ] ---
 
