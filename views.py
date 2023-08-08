@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Flask, g, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
+from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
 from models import User, Role, Garment, Job
-from application import db
+from application import application, db
 
 views = Blueprint('views', __name__)
 
@@ -43,6 +44,32 @@ def get_jobs_for_garment(garment_id):
 @manager_required
 def manage_inventory():
     return render_template('inventory.html')
+
+@views.route('/inventory/garments')
+@login_required
+@manager_required
+def manage_garments():
+    page, per_page, offset = get_page_args(page_parameter='page',
+                                           per_page_parameter='per_page')
+
+    per_page = 10
+
+    # Query the Garment table and get paginated data
+    garments_pagination = Garment.query.order_by(Garment.id).paginate(page=page, per_page=per_page)
+
+    return render_template('garments.html', garments_pagination=garments_pagination)
+
+@views.route('/inventory/jobs')
+@login_required
+@manager_required
+def manage_jobs():
+    return render_template('jobs.html')
+
+@views.route('/inventory/prices')
+@login_required
+@manager_required
+def manage_prices():
+    return render_template('prices.html')
 
 # [ ADMIN ] ---
 

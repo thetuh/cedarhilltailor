@@ -45,7 +45,7 @@
                       <a class="nav-item nav-link" id="inventory" href="/inventory">Inventory</a>
                   {% endif %}
                   {% if has_role(current_user, 'admin') %}
-                      <a class="nav-item nav-link" id="users" href="/users">Manage users</a>
+                      <a class="nav-item nav-link" id="users" href="/users">Users</a>
                   {% endif %}
                   {% if current_user.is_authenticated %}
                       <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
