@@ -25,7 +25,7 @@ def search_order():
 @login_required
 @manager_required
 def create_order():
-    available_garments = Garment.query.all()
+    available_garments = Garment.query.order_by(Garment.name).all()
     return render_template('create-order.html', available_garments=available_garments)
 
 @views.route('/get_jobs_for_garment/<int:garment_id>')
@@ -80,16 +80,12 @@ def edit_jobs():
 
     per_page = 10
 
+    available_garments = Garment.query.order_by(Garment.name).all()
+
     # Query the Garment table and get paginated data
     jobs_pagination = Job.query.order_by(Job.name).paginate(page=page, per_page=per_page)
 
-    return render_template('edit-jobs.html', jobs_pagination=jobs_pagination)
-
-@views.route('/inventory/prices')
-@login_required
-@manager_required
-def manage_prices():
-    return render_template('prices.html')
+    return render_template('edit-jobs.html', jobs_pagination=jobs_pagination, available_garments=available_garments)
 
 # [ ADMIN ] ---
 

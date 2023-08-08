@@ -4,6 +4,16 @@
 {% block content %}
 <br>
 <h1 align="center">Jobs</h1>
+
+<label>Select garment to view job list</label>
+<select class="custom-select custom-select-sm garmentSelect">
+    <option selected disabled></option>
+    {% for garment in available_garments %}
+      <option value="{{ garment.id }}">{{ garment.name }}</option>
+    {% endfor %}
+  </select>
+
+<br>
 <br>
 
 <table class="table table-striped">
