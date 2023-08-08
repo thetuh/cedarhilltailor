@@ -38,6 +38,12 @@ def get_jobs_for_garment(garment_id):
     else:
         return jsonify({"jobs": []})
 
+@views.route('/inventory')
+@login_required
+@manager_required
+def manage_inventory():
+    return render_template('inventory.html')
+
 # [ ADMIN ] ---
 
 @views.route('/users')

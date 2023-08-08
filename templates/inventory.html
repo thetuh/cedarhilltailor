@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+<br>
+<h1 align="center">Inventory</h1>
+<br>
+
+<div id="wrapper">
+    <a href="/inventory/garments" class="btn btn-primary" role="button">Garments</a>
+    <a href="/inventory/jobs" class="btn btn-primary" role="button">Jobs</a>
+    <a href="/inventory/prices" class="btn btn-primary" role="button">Prices</a>
+</div>
+
+<style>
+    #wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* To center-align buttons horizontally */
+    }
+
+    .btn {
+        margin-bottom: 20px; /* Add some spacing between buttons */
+    }
+</style>
+
+{% endblock %}
