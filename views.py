@@ -49,21 +49,35 @@ def manage_inventory():
 @login_required
 @manager_required
 def manage_garments():
+    return render_template('garments.html')
+
+@views.route('/inventory/garments/edit')
+@login_required
+@manager_required
+def edit_garments():
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
 
     per_page = 10
 
     # Query the Garment table and get paginated data
-    garments_pagination = Garment.query.order_by(Garment.id).paginate(page=page, per_page=per_page)
+    garments_pagination = Garment.query.order_by(Garment.name).paginate(page=page, per_page=per_page)
 
-    return render_template('garments.html', garments_pagination=garments_pagination)
+    return render_template('edit-garments.html', garments_pagination=garments_pagination)
 
 @views.route('/inventory/jobs')
 @login_required
 @manager_required
 def manage_jobs():
-    return render_template('jobs.html')
+    page, per_page, offset = get_page_args(page_parameter='page',
+                                           per_page_parameter='per_page')
+
+    per_page = 10
+
+    # Query the Garment table and get paginated data
+    jobs_pagination = Job.query.order_by(Job.name).paginate(page=page, per_page=per_page)
+
+    return render_template('jobs.html', jobs_pagination=jobs_pagination)
 
 @views.route('/inventory/prices')
 @login_required
