@@ -80,7 +80,7 @@
                 </select>            
               </td>        
               <td>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <textarea class="form-control descriptionBox" id="exampleFormControlTextarea1" rows="3"></textarea>
               </td>
               <td class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
             </tr>
@@ -107,6 +107,7 @@ function BtnAdd() {
   // Clear the selection in the cloned row
   newRow.querySelector(".garmentSelect").selectedIndex = 0;
   newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
+  newRow.querySelector(".descriptionBox").value = "";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
