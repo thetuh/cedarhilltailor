@@ -23,7 +23,7 @@ def search_order():
 
 # [ MANAGER ] ---
 
-@views.route('/create-order')
+@views.route('/create-order', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def create_order():
