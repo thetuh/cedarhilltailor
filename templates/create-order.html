@@ -34,7 +34,7 @@
             </div>
             <div class="form-row">
               <div class="col">
-                <div class="input-group input-group-sm mb-3">
+                <div class="input-group input-group-sm">
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Phone number</span>
                   </div>
@@ -58,7 +58,6 @@
           <thead class="thead-light">
             <tr>
               <th scope="col">Item</th>
-              <th scope="col">Price</th>
               <th scope="col">Description</th>
               <th scope="col"></th>
             </tr>
@@ -76,17 +75,16 @@
                 <label class="small-label" for="basic-url">Jobs</label>
                 <select class="custom-select custom-select-sm jobSelect" multiple>
                   <option selected disabled></option>
-                </select>            
-              </td>        
-              <td style="width: 20%;">
-                <div class="input-group mb-3">
+                </select>
+                <label class="small-label" for="basic-url">Price</label>
+                <div class="input-group input-group-sm">
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">$</span>
                   </div>
                   <input type="text" class="form-control" id="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" placeholder="e.g. 10.99" aria-describedby="basic-addon1">
-                </div>
+                </div>            
               </td>
-              <td style="width: 10%;">
+              <td style="width: 25%;">
                 <textarea class="form-control descriptionBox" id="exampleFormControlTextarea1" rows="7"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
