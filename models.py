@@ -5,7 +5,7 @@ from flask_login import UserMixin
 garment_job_association = db.Table('garment_job_association',
     db.Column('garment_id', db.Integer, db.ForeignKey('garment.id'), primary_key=True),
     db.Column('job_id', db.Integer, db.ForeignKey('job.id'), primary_key=True),
-    db.Column('price', db.Float, nullable=False)
+    db.Column('price', db.DECIMAL(10, 2), nullable=False)
 )
 
 class Garment(db.Model):
@@ -21,7 +21,7 @@ class Job(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.DECIMAL(10, 2), nullable=False)
 
     # Many-to-one (Garment)
     garment_id = db.Column(db.Integer, db.ForeignKey('garment.id'), nullable=False, index=True)
