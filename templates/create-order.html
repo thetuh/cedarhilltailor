@@ -129,6 +129,7 @@ function BtnAdd() {
 
     garmentSelect.addEventListener("change", function () {
       fetchJobsForGarment(garmentSelect, jobSelect);
+      priceInput.value = "0.00";
     });
 
     jobSelect.addEventListener("change", function () {
@@ -151,6 +152,7 @@ window.addEventListener("DOMContentLoaded", function () {
   const firstRowPriceInput = firstRow.querySelector(".price");
   firstRowGarmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
+    priceInput.value = "0.00";
   });
   firstRowJobSelect.addEventListener("change", function () {
       calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRowPriceInput);
