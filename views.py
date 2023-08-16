@@ -9,6 +9,8 @@ from application import application, db
 
 views = Blueprint('views', __name__)
 
+MAX_ITEMS_PER_PAGE = 8
+
 # [ GUEST ] ---
 
 @views.route('/')
@@ -64,7 +66,7 @@ def edit_garments():
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
 
-    per_page = 10
+    per_page = MAX_ITEMS_PER_PAGE
 
     # Query the Garment table and get paginated data
     garments_pagination = Garment.query.order_by(Garment.name).paginate(page=page, per_page=per_page)
@@ -78,7 +80,7 @@ def edit_jobs():
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
 
-    per_page = 10
+    per_page = MAX_ITEMS_PER_PAGE
 
     available_garments = Garment.query.order_by(Garment.name).all()
 
