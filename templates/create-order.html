@@ -58,13 +58,14 @@
           <thead class="thead-light">
             <tr>
               <th scope="col">Item</th>
+              <th scope="col">Price</th>
               <th scope="col">Description</th>
               <th scope="col"></th>
             </tr>
           </thead>
           <tbody id="TBody">
             <tr id="TRow">
-              <td class="col-sm" style="width: 75%;">
+              <td class="col-sm" style="width: 60%;">
                 <label for="basic-url">Garment</label>
                 <select class="custom-select custom-select-sm garmentSelect">
                   <option selected disabled></option>
@@ -78,7 +79,15 @@
                 </select>            
               </td>        
               <td>
-                <textarea class="form-control descriptionBox" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">$</span>
+                  </div>
+                  <input type="text" class="form-control" id="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" placeholder="e.g. 10.99" aria-describedby="basic-addon1">
+                </div>
+              </td>
+              <td style="width: 20%;">
+                <textarea class="form-control descriptionBox" id="exampleFormControlTextarea1" rows="7"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
             </tr>
@@ -186,6 +195,28 @@ function formatPhoneNumber(number) {
   } else {
     return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
   }
+}
+
+const priceInput = document.getElementById('price');
+
+priceInput.addEventListener('input', function() {
+  const unformattedValue = priceInput.value.replace(/[^\d.]/g, ''); // Keep only digits and decimal point
+  const formattedValue = formatPrice(unformattedValue); // Format the price as needed
+  priceInput.value = formattedValue;
+});
+
+function formatPrice(price) {
+  // Remove extra decimal points
+  price = price.replace(/\.{2,}/g, '.');
+
+  // Limit to two decimal places
+  const parts = price.split('.');
+  if (parts.length > 1) {
+    parts[1] = parts[1].substr(0, 2);
+    price = parts.join('.');
+  }
+
+  return price;
 }
 
 const nameInput = document.getElementById('name');
