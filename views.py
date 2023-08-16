@@ -95,7 +95,7 @@ def edit_jobs():
 @login_required
 @admin_required
 def manage_users():
-    users = User.query.filter(not_(User.role_id == 1)).order_by(User.role_id.asc()).all()
+    users = User.query.filter(not_(User.username == 'admin')).order_by(User.role_id.asc()).all()
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
