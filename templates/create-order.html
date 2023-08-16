@@ -68,7 +68,7 @@
                 <label for="basic-url">Garment</label>
                 <select class="custom-select custom-select-sm garmentSelect">
                   <option selected disabled></option>
-                  {% for garment in available_garments %}
+                  {% for garment in garment_list %}
                     <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
                 </select>
@@ -81,7 +81,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">$</span>
                   </div>
-                  <input type="text" class="form-control" id="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" placeholder="e.g. 10.99" aria-describedby="basic-addon1">
+                  <input type="text" class="form-control price" id="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
                 </div>            
               </td>
               <td style="width: 25%; position: relative;">
@@ -113,6 +113,7 @@ function BtnAdd() {
   newRow.querySelector(".garmentSelect").selectedIndex = 0;
   newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
   newRow.querySelector(".descriptionBox").value = "";
+  newRow.querySelector(".price").value = "";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -120,12 +121,18 @@ function BtnAdd() {
   // Get the corresponding garmentSelect and jobSelect elements in the cloned row
   const garmentSelect = newRow.querySelector(".garmentSelect");
   const jobSelect = newRow.querySelector(".jobSelect");
+  const priceInput = newRow.querySelector(".price");
 
   // Add an event listener to handle garment selection updates for dynamically added rows
   if (!newRow.hasAttribute("data-event-listener-added")) {
     newRow.setAttribute("data-event-listener-added", "true");
+
     garmentSelect.addEventListener("change", function () {
       fetchJobsForGarment(garmentSelect, jobSelect);
+    });
+
+    jobSelect.addEventListener("change", function () {
+      calculateTotalPrice(garmentSelect, jobSelect, priceInput);
     });
   }
 
@@ -141,9 +148,13 @@ window.addEventListener("DOMContentLoaded", function () {
   const firstRow = document.querySelector("#TBody tr");
   const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
   const firstRowJobSelect = firstRow.querySelector(".jobSelect");
+  const firstRowPriceInput = firstRow.querySelector(".price");
   firstRowGarmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
   });
+  firstRowJobSelect.addEventListener("change", function () {
+      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRowPriceInput);
+    });
 });
 
   // Hide the "X" button in the last row if there's only one row left
@@ -246,6 +257,21 @@ function fetchJobsForGarment(selectElement, jobSelect) {
     })
     .catch(error => {
       console.error('Error fetching jobs:', error);
+    });
+}
+
+function calculateTotalPrice(garmentSelect, jobSelect, priceInput) {
+  const garmentId = garmentSelect.value;
+  const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+
+  // Use AJAX to fetch the prices for the selected garment and jobs
+  fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
+    .then(response => response.json())
+    .then(data => {
+      priceInput.value = data.totalPrice;
+    })
+    .catch(error => {
+      console.error('Error calculating total price:', error);
     });
 }
 
