@@ -26,3 +26,7 @@
 #name:focus:invalid{
     border-color: red;
 }
+
+label.small-label {
+    margin-top: 7px;
+  }
