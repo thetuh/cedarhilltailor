@@ -263,6 +263,11 @@ function fetchJobsForGarment(selectElement, jobSelect) {
 function calculateTotalPrice(garmentSelect, jobSelect, priceInput) {
   const garmentId = garmentSelect.value;
   const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+  if ( !selectedJobIds.length )
+  {
+    priceInput.value = "0.00";
+    return;
+  }
 
   // Use AJAX to fetch the prices for the selected garment and jobs
   fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
