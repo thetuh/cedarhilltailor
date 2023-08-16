@@ -19,11 +19,19 @@
     border-color: red;
 }
 
-#name:focus:valid{
+#first-name:focus:valid{
     border-color: green;
 }
 
-#name:focus:invalid{
+#first-name:focus:invalid{
+    border-color: red;
+}
+
+#last-name:focus:valid{
+    border-color: green;
+}
+
+#last-name:focus:invalid{
     border-color: red;
 }
 

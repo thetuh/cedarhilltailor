@@ -19,7 +19,7 @@
                         <div class="input-group-prepend" >
                           <span class="input-group-text" id="basic-addon1">First name</span>
                         </div>
-                        <input type="text" class="form-control" id="name" name="first-name" required pattern="[A-Za-z]{1,32}" aria-label="FirstName" placeholder="e.g. John" aria-describedby="basic-addon1">
+                        <input type="text" class="form-control" id="first-name" name="first-name" required pattern="[A-Za-z]{1,32}" aria-label="FirstName" placeholder="e.g. John" aria-describedby="basic-addon1">
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="basic-addon1">Last name</span>
                     </div>
-                    <input type="text" class="form-control" id="name" name="last-name" required pattern="[A-Za-z]{1,32}" aria-label="LastName" placeholder="e.g. Smith" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" id="last-name" name="last-name" required pattern="[A-Za-z]{1,32}" aria-label="LastName" placeholder="e.g. Smith" aria-describedby="basic-addon1">
                 </div>
             </div>
             </div>
@@ -67,14 +67,14 @@
             <tr id="TRow">
               <td class="col-sm" style="width: 50%;">
                 <label for="basic-url">Garment</label>
-                <select class="custom-select custom-select-sm garmentSelect" required>
+                <select class="custom-select custom-select-sm garmentSelect" required name="garment">
                   <option selected disabled></option>
                   {% for garment in garment_list %}
                     <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
                 </select>
                 <label class="small-label" for="basic-url">Jobs</label>
-                <select class="custom-select custom-select-sm jobSelect" multiple required>
+                <select class="custom-select custom-select-sm jobSelect" multiple required name="job">
                   <option selected disabled></option>
                 </select>
                 <label class="small-label" for="basic-url">Price</label>
@@ -82,11 +82,11 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">$</span>
                   </div>
-                  <input type="text" class="form-control price" id="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
+                  <input type="text" class="form-control price" id="price" name="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
                 </div>            
               </td>
               <td style="width: 25%; position: relative;">
-                <textarea style="position: absolute; height: 96%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1"></textarea>
+                <textarea name="description" style="position: absolute; height: 96%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
             </tr>
@@ -242,11 +242,17 @@ function formatPrice(price) {
   return price;
 }
 
-const nameInput = document.getElementById('name');
+const firstNameInput = document.getElementById('first-name');
+const lastNameInput = document.getElementById('last-name');
 
-nameInput.addEventListener('input', function() {
-  const cleanedValue = nameInput.value.replace(/[^A-Za-z]/g, '');
-  nameInput.value = cleanedValue;
+firstNameInput.addEventListener('input', function() {
+  const cleanedValue = firstNameInput.value.replace(/[^A-Za-z]/g, '');
+  firstNameInput.value = cleanedValue;
+});
+
+lastNameInput.addEventListener('input', function() {
+  const cleanedValue = lastNameInput.value.replace(/[^A-Za-z]/g, '');
+  lastNameInput.value = cleanedValue;
 });
 
 function fetchJobsForGarment(selectElement, jobSelect) {

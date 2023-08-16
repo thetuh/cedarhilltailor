@@ -27,6 +27,39 @@ def search_order():
 @login_required
 @manager_required
 def create_order():
+    if request.method == 'POST':
+        first_name = request.form.get('first-name')
+        last_name = request.form.get('last-name')
+        phone_number = request.form.get('phone-number')
+        garment_id = request.form.get('garment')
+        job_id = request.form.get('job')
+        price = request.form.get('price')
+
+        errors = []
+
+        # Input Validation
+        if not first_name:
+            errors.append('Please enter a first name')
+        elif not last_name:
+            errors.append('Please enter a last name')
+        elif not phone_number:
+            errors.append('Please enter a phone number')
+        elif not garment_id:
+            errors.append('Please select a garment')
+        elif not job_id:
+            errors.append('Please select a job')
+        elif not price:
+            errors.append('Please input price')
+
+        # Error message display
+        if errors:
+            error_message = ' '.join(errors)
+            flash(error_message, category='error')
+            return render_template('create-order.html')
+    
+        job = Job.query.filter_by(id=job_id).first()
+        print(job.name)
+    
     garment_list = Garment.query.order_by(Garment.name).all()
     return render_template('create-order.html', garment_list=garment_list)
 
@@ -98,12 +131,12 @@ def edit_jobs():
 
     per_page = MAX_ITEMS_PER_PAGE
 
-    available_garments = Garment.query.order_by(Garment.name).all()
+    garment_list = Garment.query.order_by(Garment.name).all()
 
     # Query the Garment table and get paginated data
     jobs_pagination = Job.query.order_by(Job.name).paginate(page=page, per_page=per_page)
 
-    return render_template('edit-jobs.html', jobs_pagination=jobs_pagination, available_garments=available_garments)
+    return render_template('edit-jobs.html', jobs_pagination=jobs_pagination, garment_list=garment_list)
 
 # [ ADMIN ] ---
 
