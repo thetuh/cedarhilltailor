@@ -31,8 +31,8 @@ def create_order():
         first_name = request.form.get('first-name')
         last_name = request.form.get('last-name')
         phone_number = request.form.get('phone-number')
-        garment_id = request.form.get('garment')
-        job_id = request.form.get('job')
+        garment_ids = request.form.getlist('garment[]')
+        job_ids = request.form.getlist('job[]')
         price = request.form.get('price')
 
         errors = []
@@ -44,9 +44,9 @@ def create_order():
             errors.append('Please enter a last name')
         elif not phone_number:
             errors.append('Please enter a phone number')
-        elif not garment_id:
+        elif not garment_ids:
             errors.append('Please select a garment')
-        elif not job_id:
+        elif not job_ids:
             errors.append('Please select a job')
         elif not price:
             errors.append('Please input price')
@@ -56,9 +56,14 @@ def create_order():
             error_message = ' '.join(errors)
             flash(error_message, category='error')
             return render_template('create-order.html')
-    
-        job = Job.query.filter_by(id=job_id).first()
-        print(job.name)
+
+        for garment_id in garment_ids:
+            garment = Garment.query.filter_by(id=garment_id).first()
+            print(garment.name)
+
+        for job_id in job_ids:
+            job = Job.query.filter_by(id=job_id).first()
+            print(job.name)
     
     garment_list = Garment.query.order_by(Garment.name).all()
     return render_template('create-order.html', garment_list=garment_list)

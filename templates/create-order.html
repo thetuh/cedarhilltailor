@@ -67,14 +67,14 @@
             <tr id="TRow">
               <td class="col-sm" style="width: 50%;">
                 <label for="basic-url">Garment</label>
-                <select class="custom-select custom-select-sm garmentSelect" required name="garment">
+                <select class="custom-select custom-select-sm garmentSelect" required name="garment[]">
                   <option selected disabled></option>
                   {% for garment in garment_list %}
                     <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
                 </select>
                 <label class="small-label" for="basic-url">Jobs</label>
-                <select class="custom-select custom-select-sm jobSelect" multiple required name="job">
+                <select class="custom-select custom-select-sm jobSelect" multiple required name="job[]">
                   <option selected disabled></option>
                 </select>
                 <label class="small-label" for="basic-url">Price</label>
