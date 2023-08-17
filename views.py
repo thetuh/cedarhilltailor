@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
-from models import User, Role, Garment, Job, garment_job_association
+from models import User, Role, Garment, Job, garment_job_pair
 from application import application, db
 
 views = Blueprint('views', __name__)
@@ -82,7 +82,7 @@ def calculate_total_price(garment_id, job_ids):
     
     total_price = 0
     for job in selected_jobs:
-        price_query = db.session.query(garment_job_association).filter_by(garment_id=garment_id, job_id=job.id)
+        price_query = db.session.query(garment_job_pair).filter_by(garment_id=garment_id, job_id=job.id)
         price_entry = price_query.first()
         
         if price_entry:
