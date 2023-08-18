@@ -82,7 +82,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">$</span>
                   </div>
-                  <input type="text" class="form-control price" id="price" name="price" required pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
+                  <input type="text" class="form-control price" id="price" name="price[]" required pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
                 </div>            
               </td>
               <td style="width: 25%; position: relative;">
@@ -308,24 +308,26 @@ function fetchJobsForGarment(selectElement, jobSelect) {
 function calculateTotalPrice(garmentSelect, jobSelect, priceInput, itemInput) {
   const garmentId = garmentSelect.value;
   const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+
   if ( !selectedJobIds.length )
   {
     priceInput.value = "";
     return;
   }
-
-  const orderItem = {
-    garment: garmentId,
-    jobs: selectedJobIds
-  };
-
-  itemInput.value = JSON.stringify(orderItem);
-
+  
   // Use AJAX to fetch the prices for the selected garment and jobs
   fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
     .then(response => response.json())
     .then(data => {
       priceInput.value = data.totalPrice;
+
+      const orderItem =
+      {
+        price: data.totalPrice,
+        jobs: data.jobPairs,
+      };
+
+      itemInput.value = JSON.stringify(orderItem);
     })
     .catch(error => {
       console.error('Error calculating total price:', error);

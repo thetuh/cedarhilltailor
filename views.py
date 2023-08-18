@@ -4,8 +4,9 @@ from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
-from models import User, Role, Garment, Job, garment_job_pair
+from models import User, Role, Garment, Job, garment_job_pair, Order, OrderItem
 from application import application, db
+from decimal import Decimal
 import json
 
 views = Blueprint('views', __name__)
@@ -32,9 +33,6 @@ def create_order():
         first_name = request.form.get('first-name')
         last_name = request.form.get('last-name')
         phone_number = request.form.get('phone-number')
-        garment_ids = request.form.getlist('garment[]')
-        job_ids = request.form.getlist('job[]')
-        price = request.form.get('price')
 
         errors = []
 
@@ -45,28 +43,41 @@ def create_order():
             errors.append('Please enter a last name')
         elif not phone_number:
             errors.append('Please enter a phone number')
-        elif not garment_ids:
-            errors.append('Please select a garment')
-        elif not job_ids:
-            errors.append('Please select a job')
-        elif not price:
-            errors.append('Please input price')
 
         # Error message display
         if errors:
             error_message = ' '.join(errors)
             flash(error_message, category='error')
             return render_template('create-order.html')
-        
+
+        total_price = 0
         order_item_json_list = request.form.getlist('item[]')
         for order_item_json in order_item_json_list:
-            order_item = json.loads(order_item_json)
-            garment_id = order_item.get('garment')
-            job_ids = order_item.get('jobs')
-            print('garment: ' + garment_id)
-            for job_id in job_ids:
-                print('job: ' + job_id)
-    
+                total_price += Decimal(json.loads(order_item_json).get('price'))
+
+        try:
+            new_order = Order(price=Decimal(total_price))
+            db.session.add(new_order)
+            db.session.flush()  # Flush to get the new_order ID
+
+            for order_item_json in order_item_json_list:
+                order_item = json.loads(order_item_json)
+                pair_ids = order_item.get('jobs')
+                price = order_item.get('price')
+
+                for pair_id in pair_ids:
+                    new_order_item = OrderItem(order_id=new_order.id, pair_id=pair_id, price=price)
+                    db.session.add(new_order_item)
+                
+            # Commit after adding all order items
+            db.session.commit()
+
+        except Exception as e:
+            db.session.rollback()  # Rollback the transaction in case of an error
+            flash(f"An error occurred: {str(e)}", category='error')
+            garment_list = Garment.query.order_by(Garment.name).all()
+            return render_template('create-order.html', garment_list=garment_list)
+
     garment_list = Garment.query.order_by(Garment.name).all()
     return render_template('create-order.html', garment_list=garment_list)
 
@@ -88,14 +99,15 @@ def calculate_total_price(garment_id, job_ids):
     selected_jobs = Job.query.filter(Job.id.in_(job_ids.split(","))).all()
     
     total_price = 0
+    job_pairs = []
     for job in selected_jobs:
-        price_query = db.session.query(garment_job_pair).filter_by(garment_id=garment_id, job_id=job.id)
-        price_entry = price_query.first()
+        price_entry = db.session.query(garment_job_pair).filter_by(garment_id=garment_id, job_id=job.id).first()
         
         if price_entry:
             total_price += price_entry.price
+            job_pairs.append(price_entry.id)
             
-    return jsonify({"totalPrice": total_price})
+    return jsonify({"totalPrice": total_price, "jobPairs": job_pairs })
 
 @views.route('/inventory')
 @login_required
