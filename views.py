@@ -20,6 +20,21 @@ MAX_ITEMS_PER_PAGE = 8
 def home():
     return render_template('home.html')
 
+@views.route('/search_order_by_id/<int:id>')
+def search_by_id(id):
+    order = Order.query.filter_by(id=id).first()
+    if order is not None:
+        order_dict = {
+            "id": order.id,
+            "customer_id": order.customer_id,
+            "price": order.price,
+            "order_date": order.order_date,
+            "completion_date": order.completion_date
+        }
+        return jsonify({"order": order_dict})
+    else:
+        return jsonify({"order": []})
+
 @views.route('/search-order')
 def search_order():
     return render_template('search-order.html')
