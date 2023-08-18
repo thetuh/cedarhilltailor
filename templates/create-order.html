@@ -321,7 +321,7 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
 
-  if ( !selectedJobIds.length )
+  if ( !selectedJobIds.length || !garmentId )
   {
     priceInput.value = "";
     return;
@@ -357,7 +357,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
 
- if ( !selectedJobIds.length )
+ if ( !selectedJobIds.length || !garmentId )
     return;
 
   // Use AJAX to fetch the prices for the selected garment and jobs
