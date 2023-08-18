@@ -15,16 +15,24 @@ garment_job_pair = db.Table('garment_job_pair',
     db.UniqueConstraint('garment_id', 'job_id', name='uq_garment_job_pair')
 )
 
-# Junction table used to store the association of a pair and order id
-# Note that the price can be different from the garment_job_pair table since it can be manually overrided
-class OrderItem(db.Model):
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), primary_key=True)
+# Junction table used to store the association of job pair and order id
+class ItemJob(db.Model):
+    item_id = db.Column(db.Integer, db.ForeignKey('order_item.id'), primary_key=True)
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
+
+# Junction table used to store the association of a order and its items (image, description, price)
+class OrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     price = db.Column(db.DECIMAL(10, 2), nullable=False)
+    description = db.Column(db.String(255), nullable=True)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     price = db.Column(db.DECIMAL(10, 2), nullable=False)
+    order_date = db.Column(db.Date, index=True, nullable=False)
+    completion_date = db.Column(db.Date, index=True, nullable=False)
 
     # One-to-many (OrderItem)
     order_items = db.relationship('OrderItem', backref='order', lazy='joined')
@@ -52,3 +60,9 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False, index=True)
+
+class Customer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    phone_number = db.Column(db.String(10), unique=True, index=True)

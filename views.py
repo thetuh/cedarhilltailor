@@ -4,8 +4,9 @@ from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
-from models import User, Role, Garment, Job, garment_job_pair, Order, OrderItem
+from models import User, Role, Garment, Job, garment_job_pair, Order, OrderItem, Customer, ItemJob
 from application import application, db
+from datetime import datetime
 from decimal import Decimal
 import json
 
@@ -32,7 +33,8 @@ def create_order():
     if request.method == 'POST':
         first_name = request.form.get('first-name')
         last_name = request.form.get('last-name')
-        phone_number = request.form.get('phone-number')
+        phone_number = request.form.get('phone-number').replace('-', '')
+        completion_date = request.form.get('date')
 
         errors = []
 
@@ -43,6 +45,8 @@ def create_order():
             errors.append('Please enter a last name')
         elif not phone_number:
             errors.append('Please enter a phone number')
+        elif not completion_date:
+            errors.append('Please enter a completion date')
 
         # Error message display
         if errors:
@@ -56,18 +60,30 @@ def create_order():
                 total_price += Decimal(json.loads(order_item_json).get('price'))
 
         try:
-            new_order = Order(price=Decimal(total_price))
+            # Check if customer already exists
+            customer = Customer.query.filter_by(phone_number=phone_number).first()
+            if not customer:
+                customer = Customer(first_name=first_name,last_name=last_name,phone_number=phone_number)
+                db.session.add(customer)
+                db.session.flush()
+            
+            new_order = Order(customer_id=customer.id,price=Decimal(total_price), order_date=datetime.now().date(), completion_date=completion_date)
             db.session.add(new_order)
-            db.session.flush()  # Flush to get the new_order ID
+            db.session.flush()
 
             for order_item_json in order_item_json_list:
                 order_item = json.loads(order_item_json)
-                pair_ids = order_item.get('jobs')
                 price = order_item.get('price')
+                description = order_item.get('description')
+                
+                new_order_item = OrderItem(order_id=new_order.id, price=price, description=description)
+                db.session.add( new_order_item )
+                db.session.flush()
 
+                pair_ids = order_item.get('jobs')
                 for pair_id in pair_ids:
-                    new_order_item = OrderItem(order_id=new_order.id, pair_id=pair_id, price=price)
-                    db.session.add(new_order_item)
+                    new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id)
+                    db.session.add(new_item_job)
                 
             # Commit after adding all order items
             db.session.commit()

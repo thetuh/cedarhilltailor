@@ -86,7 +86,7 @@
                 </div>            
               </td>
               <td style="width: 25%; position: relative;">
-                <textarea name="description" style="position: absolute; height: 96%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1"></textarea>
+                <textarea name="description" style="position: absolute; height: 96%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
@@ -99,7 +99,7 @@
         <br>
         <label for="basic-url">Completion date</label>
         <div class="md-form md-outline input-with-post-icon datepicker">
-          <input placeholder="Select date" type="date" id="example" class="form-control form-control-sm" required>
+          <input placeholder="Select date" name="date" type="date" id="example" class="form-control form-control-sm" required>
         </div>
       </div>
   </div>
@@ -136,7 +136,6 @@ function BtnAdd() {
   const garmentSelect = newRow.querySelector(".garmentSelect");
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
-  const itemInput = newRow.querySelector(".itemArray");
 
   // Add an event listener to handle garment selection updates for dynamically added rows
   if (!newRow.hasAttribute("data-event-listener-added")) {
@@ -148,7 +147,7 @@ function BtnAdd() {
     });
 
     jobSelect.addEventListener("change", function () {
-      calculateTotalPrice(garmentSelect, jobSelect, priceInput, itemInput);
+      calculateTotalPrice(garmentSelect, jobSelect, newRow);
     });
   }
 
@@ -165,13 +164,12 @@ window.addEventListener("DOMContentLoaded", function () {
   const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
   const firstRowJobSelect = firstRow.querySelector(".jobSelect");
   const firstRowPriceInput = firstRow.querySelector(".price");
-  const firstRowItemInput = firstRow.querySelector(".itemArray");
   firstRowGarmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
-    priceInput.value = "";
+    firstRowPriceInput.value = "";
   });
   firstRowJobSelect.addEventListener("change", function () {
-      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRowPriceInput, firstRowItemInput);
+      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
     });
 });
 
@@ -305,9 +303,13 @@ function fetchJobsForGarment(selectElement, jobSelect) {
     })
 })()
 
-function calculateTotalPrice(garmentSelect, jobSelect, priceInput, itemInput) {
+function calculateTotalPrice(garmentSelect, jobSelect, row) {
   const garmentId = garmentSelect.value;
   const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+
+  const priceInput = row.querySelector(".price");
+  const itemInput = row.querySelector(".itemArray");
+  const descriptionInput = row.querySelector(".descriptionBox").value;
 
   if ( !selectedJobIds.length )
   {
@@ -321,10 +323,12 @@ function calculateTotalPrice(garmentSelect, jobSelect, priceInput, itemInput) {
     .then(data => {
       priceInput.value = data.totalPrice;
 
+      // easy to add other fields if needed
       const orderItem =
       {
         price: data.totalPrice,
         jobs: data.jobPairs,
+        description: descriptionInput
       };
 
       itemInput.value = JSON.stringify(orderItem);
