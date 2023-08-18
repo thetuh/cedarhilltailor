@@ -6,6 +6,7 @@ from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
 from models import User, Role, Garment, Job, garment_job_pair
 from application import application, db
+import json
 
 views = Blueprint('views', __name__)
 
@@ -56,14 +57,15 @@ def create_order():
             error_message = ' '.join(errors)
             flash(error_message, category='error')
             return render_template('create-order.html')
-
-        for garment_id in garment_ids:
-            garment = Garment.query.filter_by(id=garment_id).first()
-            print(garment.name)
-
-        for job_id in job_ids:
-            job = Job.query.filter_by(id=job_id).first()
-            print(job.name)
+        
+        order_item_json_list = request.form.getlist('item[]')
+        for order_item_json in order_item_json_list:
+            order_item = json.loads(order_item_json)
+            garment_id = order_item.get('garment')
+            job_ids = order_item.get('jobs')
+            print('garment: ' + garment_id)
+            for job_id in job_ids:
+                print('job: ' + job_id)
     
     garment_list = Garment.query.order_by(Garment.name).all()
     return render_template('create-order.html', garment_list=garment_list)

@@ -6,7 +6,7 @@
 <h1 align="center">Create order</h1>
 <br>
 
-<form class="needs-validation" novalidate method="POST">
+<form id="myForm" class="needs-validation" novalidate method="POST">
 <div class="container">
     <div class="card">
         <div class="card-header">
@@ -89,6 +89,7 @@
                 <textarea name="description" style="position: absolute; height: 96%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
+              <input type="hidden" name="item[]" class="itemArray">
             </tr>
           </tbody>
         </table>
@@ -126,6 +127,7 @@ function BtnAdd() {
   newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
   newRow.querySelector(".descriptionBox").value = "";
   newRow.querySelector(".price").value = "";
+  newRow.querySelector(".itemArray").value="";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -134,6 +136,7 @@ function BtnAdd() {
   const garmentSelect = newRow.querySelector(".garmentSelect");
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
+  const itemInput = newRow.querySelector(".itemArray");
 
   // Add an event listener to handle garment selection updates for dynamically added rows
   if (!newRow.hasAttribute("data-event-listener-added")) {
@@ -145,7 +148,7 @@ function BtnAdd() {
     });
 
     jobSelect.addEventListener("change", function () {
-      calculateTotalPrice(garmentSelect, jobSelect, priceInput);
+      calculateTotalPrice(garmentSelect, jobSelect, priceInput, itemInput);
     });
   }
 
@@ -162,12 +165,13 @@ window.addEventListener("DOMContentLoaded", function () {
   const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
   const firstRowJobSelect = firstRow.querySelector(".jobSelect");
   const firstRowPriceInput = firstRow.querySelector(".price");
+  const firstRowItemInput = firstRow.querySelector(".itemArray");
   firstRowGarmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
     priceInput.value = "";
   });
   firstRowJobSelect.addEventListener("change", function () {
-      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRowPriceInput);
+      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRowPriceInput, firstRowItemInput);
     });
 });
 
@@ -301,7 +305,7 @@ function fetchJobsForGarment(selectElement, jobSelect) {
     })
 })()
 
-function calculateTotalPrice(garmentSelect, jobSelect, priceInput) {
+function calculateTotalPrice(garmentSelect, jobSelect, priceInput, itemInput) {
   const garmentId = garmentSelect.value;
   const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
   if ( !selectedJobIds.length )
@@ -309,6 +313,13 @@ function calculateTotalPrice(garmentSelect, jobSelect, priceInput) {
     priceInput.value = "";
     return;
   }
+
+  const orderItem = {
+    garment: garmentId,
+    jobs: selectedJobIds
+  };
+
+  itemInput.value = JSON.stringify(orderItem);
 
   // Use AJAX to fetch the prices for the selected garment and jobs
   fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
@@ -321,5 +332,17 @@ function calculateTotalPrice(garmentSelect, jobSelect, priceInput) {
     });
 }
 
+document.getElementById("myForm").addEventListener("submit", function (event) {
+  // Your function logic here, executed before form submission
+
+  // If you need to prevent the form from submitting based on your logic
+  // event.preventDefault();
+
+  //console.log('called');
+
+  // Otherwise, the form will proceed with the normal submission process
+});
+
 </script>
+
 {% endblock %}
