@@ -5,4 +5,43 @@
 <br>
 <h1 align="center">Search order</h1>
 <br>
+
+<form class="needs-validation" novalidate>
+<div class="input-group input-group-sm mb-3">
+    <input type="text" class="form-control" placeholder="Search by order ID" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+    <div class="input-group-append">
+      <button class="btn btn-primary" type="search">Search</button>
+    </div>
+</div>
+</form>
+
+<form class="needs-validation" novalidate>
+<div class="input-group input-group-sm mb-3">
+    <input type="text" class="form-control" placeholder="Search by phone number" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+    <div class="input-group-append">
+      <button class="btn btn-primary" type="search">Search</button>
+    </div>
+</div>
+</form>
+
+<script>
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+
 {% endblock %}

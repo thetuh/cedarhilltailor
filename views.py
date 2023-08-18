@@ -108,6 +108,20 @@ def get_jobs_for_garment(garment_id):
     else:
         return jsonify({"jobs": []})
 
+@views.route('/get_job_pairs/<int:garment_id>/<job_ids>')
+@login_required
+@manager_required
+def get_job_pairs(garment_id, job_ids):
+    selected_jobs = Job.query.filter(Job.id.in_(job_ids.split(","))).all()
+    
+    job_pairs = []
+    for job in selected_jobs:
+        job_pair = db.session.query(garment_job_pair).filter_by(garment_id=garment_id, job_id=job.id).first()
+        if job_pair:
+            job_pairs.append(job_pair.id)
+
+    return jsonify({"jobPairs": job_pairs})
+
 @views.route('/calculate_total_price/<int:garment_id>/<job_ids>')
 @login_required
 @manager_required

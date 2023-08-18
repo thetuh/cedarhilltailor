@@ -149,6 +149,11 @@ function BtnAdd() {
     jobSelect.addEventListener("change", function () {
       calculateTotalPrice(garmentSelect, jobSelect, newRow);
     });
+
+    priceInput.addEventListener('input', function()
+    {
+      overrideTotalPrice(garmentSelect, jobSelect, newRow);
+    });
   }
 
   // Show the "X" button in all rows except the first one
@@ -170,6 +175,11 @@ window.addEventListener("DOMContentLoaded", function () {
   });
   firstRowJobSelect.addEventListener("change", function () {
       calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+    });
+
+    firstRowPriceInput.addEventListener('input', function()
+    {
+      overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
     });
 });
 
@@ -335,6 +345,38 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
     })
     .catch(error => {
       console.error('Error calculating total price:', error);
+    });
+}
+
+function overrideTotalPrice(garmentSelect, jobSelect, row)
+{
+  const garmentId = garmentSelect.value;
+  const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+
+  const priceValue = row.querySelector(".price").value;
+  const itemInput = row.querySelector(".itemArray");
+  const descriptionInput = row.querySelector(".descriptionBox").value;
+
+ if ( !selectedJobIds.length )
+    return;
+
+  // Use AJAX to fetch the prices for the selected garment and jobs
+  fetch(`/get_job_pairs/${garmentId}/${selectedJobIds.join(",")}`)
+    .then(response => response.json())
+    .then(data => {
+
+      // easy to add other fields if needed
+      const orderItem =
+      {
+        price: priceValue,
+        jobs: data.jobPairs,
+        description: descriptionInput
+      };
+
+      itemInput.value = JSON.stringify(orderItem);
+    })
+    .catch(error => {
+      console.error('Error retrieving job pairs:', error);
     });
 }
 
