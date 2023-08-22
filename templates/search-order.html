@@ -6,60 +6,66 @@
 <h1 align="center">Search order</h1>
 <br>
 
-<form class="needs-validation" novalidate>
+<form class="needs-validation" novalidate id="order-form">
 <div class="input-group input-group-sm mb-3">
-    <input type="text" class="form-control"  id="order-id" placeholder="Search by order ID" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+    <input type="text" class="form-control" name="order-id" id="order-id" placeholder="Search by order ID" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
     <div class="input-group-append">
-      <button class="btn btn-primary" id="search-by-id" type="submit">Search</button>
+      <button class="btn btn-primary" type="submit">Search</button>
     </div>
 </div>
 </form>
 
-<form class="needs-validation" novalidate>
+<form class="needs-validation" novalidate id="phone-form">
 <div class="input-group input-group-sm mb-3">
-    <input type="text" class="form-control" id="phone-number" placeholder="Search by phone number" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+    <input type="tel" class="form-control" name="phone-number" id="phone-number" placeholder="Search by phone number" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
     <div class="input-group-append">
-      <button class="btn btn-primary" id="search-by-number" type="submit">Search</button>
+      <button class="btn btn-primary" type="submit">Search</button>
     </div>
 </div>
 </form>
-
-<div id="search-results" style="display: none;">
-    <table class="table table-sm table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Customer ID</th>
-                <th>Total Amount</th>
-            </tr>
-        </thead>
-        <tbody id="results-body">
-        </tbody>
-    </table>
-</div>
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-    const searchByIdButton = document.getElementById("search-by-id");
+const orderIdInput = document.getElementById("order-id");
+const phoneInput = document.getElementById('phone-number');
 
-    const orderIdInput = document.getElementById("order-id");
-    orderIdInput.addEventListener("input", function () {
-        // Remove non-numeric characters from the input
-        this.value = this.value.replace(/\D/g, '');
-        });
-
-    searchByIdButton.addEventListener("click", function () {
-        if (orderIdInput.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-            searchbyId(orderIdInput.value);
-        } else {
-            orderIdInput.reportValidity(); // Show validation effect
-        }
-    });
+orderIdInput.addEventListener("input", function () {
+    // Remove non-numeric characters from the input
+    this.value = this.value.replace(/\D/g, '');
 });
 
+phoneInput.addEventListener('input', function() {
+  const unformattedValue = phoneInput.value.replace(/\D/g, '');
+  const formattedValue = formatPhoneNumber(unformattedValue);
+  phoneInput.value = formattedValue;
+});
+
+const orderForm = document.getElementById('order-form');
+orderForm.addEventListener('submit', function(event) {
+  const order_id = orderIdInput.value;
+  event.preventDefault();  // Prevent the form submission
+  window.location.href = `/search-id/${order_id}`;  // Redirect to the URL
+});
+
+const phoneForm = document.getElementById('phone-form');
+phoneForm.addEventListener('submit', function(event) {
+  const phone_num = phoneInput.value;
+  event.preventDefault();  // Prevent the form submission
+  window.location.href = `/search-number/${phone_num}`;
+});
+
+function formatPhoneNumber(number) {
+  const numberLength = number.length;
+  if (numberLength <= 3) {
+    return number;
+  } else if (numberLength <= 7) {
+    return `${number.slice(0, 3)}-${number.slice(3)}`;
+  } else {
+    return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
+  }
+}
+
+// Validation
 (function() {
   'use strict';
   window.addEventListener('load', function() {
@@ -77,31 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, false);
 })();
-
-function searchbyId(orderId) {
-  // Use AJAX to fetch the prices for the selected garment and jobs
-  fetch(`/search_order_by_id/${orderId}`)
-    .then(response => response.json())
-    .then(data =>
-    {
-        const resultsBody = document.getElementById("results-body");
-        resultsBody.innerHTML = ""; // Clear existing content
-
-        const order = data.order; // Access the order data
-        const row = resultsBody.insertRow();
-        const cellValues = [order.id, order.customer_id, order.price];
-        cellValues.forEach(value => {
-            const cell = row.insertCell();
-            cell.textContent = value;
-        });
-
-        const searchResults = document.getElementById("search-results");
-        searchResults.style.display = "block"; // Show the search results
-    })
-    .catch(error => {
-      console.error('Error fetching orders for id:', error);
-    });
-}
 
 </script>
 {% endblock %}
