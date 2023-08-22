@@ -10,7 +10,7 @@
 <div class="input-group input-group-sm mb-3">
     <input type="text" class="form-control"  id="order-id" placeholder="Search by order ID" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
     <div class="input-group-append">
-      <button class="btn btn-primary" id="search-by-id" type="button">Search</button>
+      <button class="btn btn-primary" id="search-by-id" type="submit">Search</button>
     </div>
 </div>
 </form>
@@ -19,7 +19,7 @@
 <div class="input-group input-group-sm mb-3">
     <input type="text" class="form-control" id="phone-number" placeholder="Search by phone number" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
     <div class="input-group-append">
-      <button class="btn btn-primary" id="search-by-number" type="button">Search</button>
+      <button class="btn btn-primary" id="search-by-number" type="submit">Search</button>
     </div>
 </div>
 </form>
@@ -51,6 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     searchByIdButton.addEventListener("click", function () {
         if (orderIdInput.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
             searchbyId(orderIdInput.value);
         } else {
             orderIdInput.reportValidity(); // Show validation effect
