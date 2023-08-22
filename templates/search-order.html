@@ -42,15 +42,23 @@ phoneInput.addEventListener('input', function() {
 
 const orderForm = document.getElementById('order-form');
 orderForm.addEventListener('submit', function(event) {
-  const order_id = orderIdInput.value;
   event.preventDefault();  // Prevent the form submission
+
+  if (!orderForm.checkValidity())
+    return;
+
+  const order_id = orderIdInput.value;
   window.location.href = `/search-id/${order_id}`;  // Redirect to the URL
 });
 
 const phoneForm = document.getElementById('phone-form');
 phoneForm.addEventListener('submit', function(event) {
+  event.preventDefault();
   const phone_num = phoneInput.value;
-  event.preventDefault();  // Prevent the form submission
+
+  if (!checkPhoneValidity(phone_num))
+    return;
+
   window.location.href = `/search-number/${phone_num}`;
 });
 
@@ -63,6 +71,14 @@ function formatPhoneNumber(number) {
   } else {
     return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
   }
+}
+
+function checkPhoneValidity(number)
+{
+  if ( number.length == 12 )
+    return true;
+  
+  return false;
 }
 
 // Validation
