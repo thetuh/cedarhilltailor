@@ -15,7 +15,7 @@ garment_job_pair = db.Table('garment_job_pair',
     db.UniqueConstraint('garment_id', 'job_id', name='uq_garment_job_pair')
 )
 
-# Junction table used to store the association of job pair and order id
+# Junction table used to store the association of job pair and item id
 class ItemJob(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('order_item.id'), primary_key=True)
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
@@ -35,7 +35,7 @@ class Order(db.Model):
     completion_date = db.Column(db.Date, index=True, nullable=False)
 
     # One-to-many (OrderItem)
-    order_items = db.relationship('OrderItem', backref='order', lazy='joined')
+    order_items = db.relationship('OrderItem', backref='order', lazy='dynamic')
 
 class Garment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -66,3 +66,6 @@ class Customer(db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(10), unique=True, index=True)
+
+    # One-to-many (Order)
+    orders = db.relationship('Order', backref='customer', lazy='dynamic')

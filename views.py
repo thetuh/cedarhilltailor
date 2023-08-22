@@ -20,6 +20,53 @@ MAX_ITEMS_PER_PAGE = 8
 def home():
     return render_template('home.html')
 
+def get_jobs_for_item_jobs(item_jobs):
+    jobs_by_item_job = {}
+    
+    for item_job in item_jobs:
+        pair_id = item_job.pair_id
+        
+        garment_job_pair = db.session.query(garment_job_pair).filter_by(pair_id=pair_id)
+        
+        if garment_job_pair:
+            job_id = garment_job_pair.job_id
+            
+            job = Job.query.get(job_id)
+            
+            if job:
+                jobs_by_item_job[item_job] = job
+    
+    return jobs_by_item_job
+
+def get_item_jobs_for_order(order_id):
+    order = Order.query.get(order_id)
+
+    if order is None:
+        return None
+    
+    item_job_by_order_item = {}
+
+    for order_item in order.order_items:
+        item_jobs = order_item.item_jobs
+        item_jobs_by_order_item[order_item] = item_jobs
+
+    return item_jobs_by_order_item
+
+@views.route('/search-id/edit', methods=['GET', 'POST'])
+@login_required
+def edit_order():
+    if request.method == 'POST':
+        order_id = request.form.get('id')
+        print(order_id)
+        order = Order.query.get(order_id)
+        if not order:
+            flash('Order not found', category='error')
+            return redirect(url_for('views.search_id'))
+
+    print('nice')
+        # Add code to handle editing the order
+    return redirect(url_for('views.search_id'))
+
 @views.route('/search-id/<int:order_id>')
 def search_id(order_id):
     page, per_page, offset = get_page_args(page_parameter='page',
@@ -30,6 +77,27 @@ def search_id(order_id):
     order_pagination = Order.query.filter_by(id=order_id).paginate(page=page, per_page=per_page)
 
     return render_template('search-id.html', order_pagination=order_pagination, order_id=order_id)
+
+@views.route('/search-number/<phone_number>')
+def search_number(phone_number):
+    page, per_page, offset = get_page_args(page_parameter='page',
+                                            per_page_parameter='per_page')
+    per_page = MAX_ITEMS_PER_PAGE
+    
+    order_pagination = None  # Initialize the variable
+    
+    try:
+        # Query orders with customers whose phone numbers match the given phone number
+        order_pagination = Order.query \
+            .join(Customer) \
+            .options(joinedload(Order.customer)) \
+            .filter(Customer.phone_number == phone_number) \
+            .paginate(page=page, per_page=per_page)
+    except Exception:
+        print("No orders found for the given phone number.")
+
+    return render_template('search-number.html', order_pagination=order_pagination, phone_number=phone_number)
+
 
 @views.route('/search-order')
 def search_order():
