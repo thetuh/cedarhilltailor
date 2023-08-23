@@ -20,38 +20,6 @@ MAX_ITEMS_PER_PAGE = 8
 def home():
     return render_template('home.html')
 
-def get_jobs_for_item_jobs(item_jobs):
-    jobs_by_item_job = {}
-    
-    for item_job in item_jobs:
-        pair_id = item_job.pair_id
-        
-        garment_job_pair = GarmentJobPair.query.filter_by(pair_id=pair_id)
-        
-        if garment_job_pair:
-            job_id = garment_job_pair.job_id
-            
-            job = Job.query.get(job_id)
-            
-            if job:
-                jobs_by_item_job[item_job] = job
-    
-    return jobs_by_item_job
-
-def get_item_jobs_for_order(order_id):
-    order = Order.query.get(order_id)
-
-    if order is None:
-        return None
-    
-    item_job_by_order_item = {}
-
-    for order_item in order.order_items:
-        item_jobs = order_item.item_jobs
-        item_jobs_by_order_item[order_item] = item_jobs
-
-    return item_jobs_by_order_item
-
 @views.route('/search-id/edit', methods=['GET', 'POST'])
 @login_required
 def edit_order():

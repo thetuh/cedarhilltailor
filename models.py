@@ -1,6 +1,11 @@
+from enum import Enum
 from application import db
 from flask_login import UserMixin
 from sqlalchemy.schema import UniqueConstraint
+
+class Status(Enum):
+    INCOMPLETE = 0
+    COMPLETE = 1
 
 class GarmentJobPair(db.Model):
     __tablename__ = 'garment_job_pair'
@@ -21,6 +26,8 @@ class GarmentJobPair(db.Model):
 class ItemJob(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('order_item.id'), primary_key=True)
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
+
+    status = db.Column(db.SmallInteger, nullable=False, default=Status.INCOMPLETE)
 
     pair = db.relationship('GarmentJobPair', backref='item_job', lazy='joined')
 

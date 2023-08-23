@@ -63,7 +63,13 @@
                                 {% for item_job in order_item.item_jobs %}
                                 <tr>
                                     <td width="50%">{{ item_job.pair.job.name }}</td>
-                                    <td>Complete</td>
+                                    <td>
+                                        {% if item_job.status == 0 %}
+                                            Incomplete
+                                        {% elif item_job.status == 1 %}
+                                            Complete
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
