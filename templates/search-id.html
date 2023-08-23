@@ -48,7 +48,7 @@
                         <label>Total price: ${{ order.price }}</label> <br>
                         {% for order_item in order.order_items %}
                         <hr class="solid">
-                        <strong>Garment</strong> <br>
+                        <strong>{{ order_item.item_jobs[0].pair.garment.name }}</strong> <br>
                         <label>Price: ${{ order_item.price }}</label> <br>
                         <label>Description:</label>
                         <textarea readonly class="form-control">{{ order_item.description }}</textarea><br>
