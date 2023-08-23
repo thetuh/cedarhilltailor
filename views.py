@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_
-from models import User, Role, Garment, Job, garment_job_pair, Order, OrderItem, Customer, ItemJob
+from models import User, Role, Garment, Job, GarmentJobPair, Order, OrderItem, Customer, ItemJob
 from application import application, db
 from datetime import datetime
 from decimal import Decimal
@@ -26,7 +26,7 @@ def get_jobs_for_item_jobs(item_jobs):
     for item_job in item_jobs:
         pair_id = item_job.pair_id
         
-        garment_job_pair = db.session.query(garment_job_pair).filter_by(pair_id=pair_id)
+        garment_job_pair = GarmentJobPair.query.filter_by(pair_id=pair_id)
         
         if garment_job_pair:
             job_id = garment_job_pair.job_id
@@ -195,7 +195,7 @@ def get_job_pairs(garment_id, job_ids):
     
     job_pairs = []
     for job in selected_jobs:
-        job_pair = db.session.query(garment_job_pair).filter_by(garment_id=garment_id, job_id=job.id).first()
+        job_pair = GarmentJobPair.query.filter_by(garment_id=garment_id, job_id=job.id).first()
         if job_pair:
             job_pairs.append(job_pair.id)
 
@@ -210,7 +210,7 @@ def calculate_total_price(garment_id, job_ids):
     total_price = 0
     job_pairs = []
     for job in selected_jobs:
-        price_entry = db.session.query(garment_job_pair).filter_by(garment_id=garment_id, job_id=job.id).first()
+        price_entry = GarmentJobPair.query.filter_by(garment_id=garment_id, job_id=job.id).first()
         
         if price_entry:
             total_price += price_entry.price

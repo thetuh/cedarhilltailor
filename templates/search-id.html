@@ -60,10 +60,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for item_job in order_item.item_jobs %}
                                 <tr>
-                                    <td width="50%">Job</td>
+                                    <td width="50%">{{ item_job.pair.job.name }}</td>
                                     <td>Complete</td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table><br>
                         {% endfor %}

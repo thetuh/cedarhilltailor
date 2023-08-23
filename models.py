@@ -1,24 +1,28 @@
 from application import db
 from flask_login import UserMixin
+from sqlalchemy.schema import UniqueConstraint
 
-# Junction table used to store the association of a particular <garment, job> pair and its base cost
-garment_job_pair = db.Table('garment_job_pair',
-    db.Column('id', db.Integer, primary_key=True),
+class GarmentJobPair(db.Model):
+    __tablename__ = 'garment_job_pair'
 
-    # These two form a composite key
-    db.Column('garment_id', db.Integer, db.ForeignKey('garment.id'), index=True),
-    db.Column('job_id', db.Integer, db.ForeignKey('job.id'), index=True),
-
-    db.Column('price', db.DECIMAL(10, 2), nullable=False),
+    id = db.Column(db.Integer, primary_key=True)
+    garment_id = db.Column(db.Integer, db.ForeignKey('garment.id'), index=True)
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), index=True)
+    price = db.Column(db.DECIMAL(10, 2), nullable=False)
 
     # Define a unique constraint on garment_id and job_id
     db.UniqueConstraint('garment_id', 'job_id', name='uq_garment_job_pair')
-)
+
+    # Relationships
+    garment = db.relationship('Garment', backref='garment_job_pairs')
+    job = db.relationship('Job', backref='garment_job_pairs')
 
 # Junction table used to store the association of job pair and item id
 class ItemJob(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('order_item.id'), primary_key=True)
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
+
+    pair = db.relationship('GarmentJobPair', backref='item_job', lazy='joined')
 
 # Junction table used to store the association of a order and its items (image, description, price)
 class OrderItem(db.Model):
@@ -45,7 +49,7 @@ class Garment(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
 
     # Many-to-many (Job)
-    jobs = db.relationship('Job', secondary=garment_job_pair, backref='garments', lazy='dynamic')
+    jobs = db.relationship('Job', secondary='garment_job_pair', backref='garments', lazy='dynamic')
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
