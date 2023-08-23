@@ -27,6 +27,9 @@ class OrderItem(db.Model):
     price = db.Column(db.DECIMAL(10, 2), nullable=False)
     description = db.Column(db.String(255), nullable=True)
 
+    # One-to-many (ItemJob)
+    item_jobs = db.relationship('ItemJob', backref='order_item', lazy='joined')
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
@@ -35,14 +38,14 @@ class Order(db.Model):
     completion_date = db.Column(db.Date, index=True, nullable=False)
 
     # One-to-many (OrderItem)
-    order_items = db.relationship('OrderItem', backref='order', lazy='dynamic')
+    order_items = db.relationship('OrderItem', backref='order', lazy='joined')
 
 class Garment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
     # Many-to-many (Job)
-    jobs = db.relationship('Job', secondary=garment_job_pair, backref='garments', lazy='joined')
+    jobs = db.relationship('Job', secondary=garment_job_pair, backref='garments', lazy='dynamic')
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,4 +71,4 @@ class Customer(db.Model):
     phone_number = db.Column(db.String(10), unique=True, index=True)
 
     # One-to-many (Order)
-    orders = db.relationship('Order', backref='customer', lazy='dynamic')
+    orders = db.relationship('Order', backref='customer', lazy='joined')
