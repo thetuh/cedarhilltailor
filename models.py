@@ -3,7 +3,11 @@ from application import db
 from flask_login import UserMixin
 from sqlalchemy.schema import UniqueConstraint
 
-class Status(Enum):
+class JobStatus(Enum):
+    INCOMPLETE = 0
+    COMPLETE = 1
+
+class OrderStatus(Enum):
     INCOMPLETE = 0
     COMPLETE = 1
 
@@ -27,7 +31,7 @@ class ItemJob(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('order_item.id'), primary_key=True)
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
 
-    status = db.Column(db.SmallInteger, nullable=False, default=Status.INCOMPLETE)
+    status = db.Column(db.SmallInteger, nullable=False, default=JobStatus.INCOMPLETE)
 
     pair = db.relationship('GarmentJobPair', backref='item_job', lazy='joined')
 
@@ -47,6 +51,8 @@ class Order(db.Model):
     price = db.Column(db.DECIMAL(10, 2), nullable=False)
     order_date = db.Column(db.Date, index=True, nullable=False)
     completion_date = db.Column(db.Date, index=True, nullable=False)
+
+    status = db.Column(db.SmallInteger, nullable=False, default=OrderStatus.INCOMPLETE)
 
     # One-to-many (OrderItem)
     order_items = db.relationship('OrderItem', backref='order', lazy='joined')
