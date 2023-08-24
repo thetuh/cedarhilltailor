@@ -168,6 +168,58 @@ function BtnAdd() {
   });
 }
 
+function BtnAddExisting(order_item) {
+  // Clone the first row
+  const newRow = document.getElementById("TRow").cloneNode(true);
+
+  // Clear the selection in the cloned row
+  newRow.querySelector(".garmentSelect").selectedIndex = 0;
+  newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
+  newRow.querySelector(".descriptionBox").value = "";
+  newRow.querySelector(".price").value = "";
+  newRow.querySelector(".itemArray").value="";
+
+  // Append the new row to the table body
+  document.getElementById("TBody").appendChild(newRow);
+
+  // Get the corresponding garmentSelect and jobSelect elements in the cloned row
+  const garmentSelect = newRow.querySelector(".garmentSelect");
+  const jobSelect = newRow.querySelector(".jobSelect");
+  const priceInput = newRow.querySelector(".price");
+
+  garmentSelect.value = order_item.garment_id;
+  fetchJobsForGarmentExisting(garmentSelect, jobSelect, order_item.job_ids);
+  priceInput.value = order_item.price;
+
+  // Add an event listener to handle garment selection updates for dynamically added rows
+  if (!newRow.hasAttribute("data-event-listener-added")) {
+    newRow.setAttribute("data-event-listener-added", "true");
+
+    garmentSelect.addEventListener("change", function () {
+      fetchJobsForGarment(garmentSelect, jobSelect);
+      priceInput.value = "";
+    });
+
+    jobSelect.addEventListener("change", function () {
+      calculateTotalPrice(garmentSelect, jobSelect, newRow);
+    });
+
+    priceInput.addEventListener('input', function()
+    {
+      overrideTotalPrice(garmentSelect, jobSelect, newRow);
+    });
+
+    // Populate the options from the order
+
+  }
+
+  // Show the "X" button in all rows except the first one
+  const rows = document.querySelectorAll("#TBody tr");
+  rows.forEach((row) => {
+    row.querySelector(".btn-delete").style.display = "inline-block";
+  });
+}
+
 // Attach the event listener to the first row when the page loads
 window.addEventListener("DOMContentLoaded", function () {
   const firstRow = document.querySelector("#TBody tr");
@@ -271,6 +323,37 @@ lastNameInput.addEventListener('input', function() {
   const cleanedValue = lastNameInput.value.replace(/[^A-Za-z]/g, '');
   lastNameInput.value = cleanedValue;
 });
+
+function fetchJobsForGarmentExisting(selectElement, jobSelect, job_ids) {
+  const garmentId = selectElement.value;
+
+  // Use AJAX to fetch jobs for the selected garment
+  fetch(`/get_jobs_for_garment/${garmentId}`)
+    .then(response => response.json())
+    .then(data => {
+      // Remove all options from the job select dropdown of the current row
+      while (jobSelect.options.length > 0) {
+        jobSelect.remove(0);
+      }
+
+      // Add job options for the selected garment to the job select dropdown of the current row
+      data.jobs.forEach(job => {
+        const option = document.createElement("option");
+        option.value = job.id;
+        option.text = job.name;
+
+        job_ids.forEach(job_id => {
+          if ( option.value == job_id )
+            option.selected = true;
+        } )
+
+        jobSelect.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching jobs:', error);
+    });
+}
 
 function fetchJobsForGarment(selectElement, jobSelect) {
   const garmentId = selectElement.value;
@@ -397,9 +480,9 @@ function populateData()
     .then(data => {
       //console.log(data);
 
-      // populate data on 
+      // populate data on
       data.order_items.forEach( order_item => {
-        BtnAdd();
+        BtnAddExisting(order_item);
       } );
 
     } )

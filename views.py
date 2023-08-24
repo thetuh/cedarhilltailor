@@ -26,9 +26,10 @@ def get_order_items(order_id):
     order = Order.query.get_or_404(order_id)
     
     output = []
-    for idx, order_item in enumerate(order.order_items):
+    for order_item in order.order_items:
         item_data = { 'garment_id' : order_item.item_jobs[0].pair.garment.id,
-        'job_ids' : [item_job.pair.job.id for item_job in order_item.item_jobs] }
+        'job_ids' : [item_job.pair.job.id for item_job in order_item.item_jobs],
+        'price' : order_item.price }
     
         output.append(item_data)
     
