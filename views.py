@@ -20,6 +20,29 @@ MAX_ITEMS_PER_PAGE = 8
 def home():
     return render_template('home.html')
 
+@views.route('/get-order-items/<int:order_id>')
+@login_required
+def get_order_items(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    output = []
+    for idx, order_item in enumerate(order.order_items):
+        item_data = { 'garment_id' : order_item.item_jobs[0].pair.garment.id,
+        'job_ids' : [item_job.pair.job.id for item_job in order_item.item_jobs] }
+    
+        output.append(item_data)
+    
+    return { "order_items" : output }
+
+# 'Hard' edit for substantial changes
+@views.route('/edit-order/<int:order_id>')
+@login_required
+def edit_order_hard(order_id):
+    order = Order.query.get_or_404(order_id)
+    garment_list = Garment.query.order_by(Garment.name).all()
+    return render_template('edit-order.html', order=order, garment_list=garment_list)
+
+# 'Soft' edit for job status
 @views.route('/search-id/edit', methods=['GET', 'POST'])
 @login_required
 def edit_order():

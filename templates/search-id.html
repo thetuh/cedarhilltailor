@@ -33,7 +33,7 @@
                 </td>
                 <td>
                     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{order.id}}">View</button>
-                    <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{order.id}}">Edit</button>
+                    <a href="/edit-order/{{ order.id }}" class="btn btn-sm btn-warning">Edit</a>
                 </td>
             </tr>
         {% endfor %}
