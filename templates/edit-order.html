@@ -7,6 +7,7 @@
 <br>
 
 <input type="hidden" id="order-id" value="{{ order.id }}" >
+<input type="hidden" id="deleted-ids" name="deleted[]" class="deletedItemArray">
 
 <form id="myForm" class="needs-validation" novalidate method="POST">
 <div class="container">
@@ -92,6 +93,8 @@
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
+              <input type="hidden" name="item-id" class="itemId" value="0">
+              <input type="hidden" value="0" class="originalOrder">
             </tr>
           </tbody>
         </table>
@@ -130,6 +133,8 @@ function BtnAdd() {
   newRow.querySelector(".descriptionBox").value = "";
   newRow.querySelector(".price").value = "";
   newRow.querySelector(".itemArray").value="";
+  newRow.querySelector('.originalOrder').value="0";
+  newRow.querySelector('.itemId').value = "0";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -140,26 +145,21 @@ function BtnAdd() {
   const priceInput = newRow.querySelector(".price");
 
   // Add an event listener to handle garment selection updates for dynamically added rows
-  if (!newRow.hasAttribute("data-event-listener-added")) {
-    newRow.setAttribute("data-event-listener-added", "true");
+  newRow.setAttribute("data-event-listener-added", "true");
 
-    garmentSelect.addEventListener("change", function () {
-      fetchJobsForGarment(garmentSelect, jobSelect);
-      priceInput.value = "";
-    });
+  garmentSelect.addEventListener("change", function () {
+    fetchJobsForGarment(garmentSelect, jobSelect);
+    priceInput.value = "";
+  });
 
-    jobSelect.addEventListener("change", function () {
-      calculateTotalPrice(garmentSelect, jobSelect, newRow);
-    });
+  jobSelect.addEventListener("change", function () {
+    calculateTotalPrice(garmentSelect, jobSelect, newRow);
+  });
 
-    priceInput.addEventListener('input', function()
-    {
-      overrideTotalPrice(garmentSelect, jobSelect, newRow);
-    });
-
-    // Populate the options from the order
-
-  }
+  priceInput.addEventListener('input', function()
+  {
+    overrideTotalPrice(garmentSelect, jobSelect, newRow);
+  });
 
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
@@ -191,6 +191,8 @@ function BtnAddExisting(order_item) {
   fetchJobsForGarmentExisting(garmentSelect, jobSelect, order_item.job_ids);
   priceInput.value = order_item.price;
   newRow.querySelector(".descriptionBox").value = order_item.description;
+  newRow.querySelector('.originalOrder').value = "1";
+  newRow.querySelector('.itemId').value = order_item.item_id;
 
   const orderItem =
   {
@@ -257,6 +259,29 @@ window.addEventListener("DOMContentLoaded", function () {
 function BtnDel(button) {
   // Get the table row containing the button
   const row = button.parentNode.parentNode;
+
+  if ( row.querySelector('.originalOrder').value == "1" )
+  {
+    orderItemId = row.querySelector('.itemId').value;
+
+    //console.log('deleting existing order item: ' + orderItemId);
+
+    deletedIds = document.getElementById('deleted-ids');
+    let deletedIdsArray = [];
+
+    if ( deletedIds.value) {
+      try {
+        deletedIdsArray = JSON.parse(deletedIds.value);
+      } catch(error) {
+        console.error('Error parsing JSON', error);
+      }
+    }
+    
+    deletedIdsArray.push(orderItemId);
+    console.log(deletedIdsArray);
+
+    deletedIds.value = JSON.stringify(deletedIdsArray);
+  } 
 
   // Remove the row from the table body
   row.remove();
@@ -433,7 +458,7 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       {
         price: order_item.price,
         jobs: order_item.pair_ids,
-        description: order_item.description
+        description: order_item.description,
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -451,7 +476,6 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
   const priceValue = row.querySelector(".price").value;
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
-
  if ( !selectedJobIds.length || !garmentId )
     return;
 
@@ -465,7 +489,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
       {
         price: priceValue,
         jobs: data.jobPairs,
-        description: descriptionInput
+        description: descriptionInput,
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -492,6 +516,8 @@ function populateData()
       fetchJobsForGarmentExisting(firstRowGarmentSelect, firstRowJobSelect, data.order_items[0].job_ids);
       firstRowPriceInput.value = data.order_items[0].price;
       firstRow.querySelector(".descriptionBox").value = data.order_items[0].description;
+      firstRow.querySelector('.originalOrder').value = "1";
+      firstRow.querySelector('.itemId').value = data.order_items[0].item_id;
 
       const orderItem =
       {

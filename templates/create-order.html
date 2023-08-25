@@ -138,23 +138,21 @@ function BtnAdd() {
   const priceInput = newRow.querySelector(".price");
 
   // Add an event listener to handle garment selection updates for dynamically added rows
-  if (!newRow.hasAttribute("data-event-listener-added")) {
-    newRow.setAttribute("data-event-listener-added", "true");
+  newRow.setAttribute("data-event-listener-added", "true");
 
-    garmentSelect.addEventListener("change", function () {
-      fetchJobsForGarment(garmentSelect, jobSelect);
-      priceInput.value = "";
-    });
+  garmentSelect.addEventListener("change", function () {
+    fetchJobsForGarment(garmentSelect, jobSelect);
+    priceInput.value = "";
+  });
 
-    jobSelect.addEventListener("change", function () {
-      calculateTotalPrice(garmentSelect, jobSelect, newRow);
-    });
+  jobSelect.addEventListener("change", function () {
+    calculateTotalPrice(garmentSelect, jobSelect, newRow);
+  });
 
-    priceInput.addEventListener('input', function()
-    {
-      overrideTotalPrice(garmentSelect, jobSelect, newRow);
-    });
-  }
+  priceInput.addEventListener('input', function()
+  {
+    overrideTotalPrice(garmentSelect, jobSelect, newRow);
+  });
 
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
