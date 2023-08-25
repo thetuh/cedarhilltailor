@@ -160,6 +160,7 @@ def create_order():
                     db.session.add(new_item_job)
                 
             # Commit after adding all order items
+            flash('Successfully created order ID #{}'.format(new_order.id), category='success')
             db.session.commit()
 
         except Exception as e:
