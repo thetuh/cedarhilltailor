@@ -137,9 +137,6 @@ function BtnAdd() {
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
 
-  // Add an event listener to handle garment selection updates for dynamically added rows
-  newRow.setAttribute("data-event-listener-added", "true");
-
   garmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(garmentSelect, jobSelect);
     priceInput.value = "";

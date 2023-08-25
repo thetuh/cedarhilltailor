@@ -144,9 +144,6 @@ function BtnAdd() {
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
 
-  // Add an event listener to handle garment selection updates for dynamically added rows
-  newRow.setAttribute("data-event-listener-added", "true");
-
   garmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(garmentSelect, jobSelect);
     priceInput.value = "";
@@ -456,9 +453,9 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       // easy to add other fields if needed
       const orderItem =
       {
-        price: order_item.price,
-        jobs: order_item.pair_ids,
-        description: order_item.description,
+        price: data.totalPrice,
+        jobs: data.jobPairs,
+        description: descriptionInput
       };
 
       itemInput.value = JSON.stringify(orderItem);
