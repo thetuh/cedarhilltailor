@@ -28,8 +28,10 @@ def get_order_items(order_id):
     output = []
     for order_item in order.order_items:
         item_data = { 'garment_id' : order_item.item_jobs[0].pair.garment.id,
+        'pair_ids' : [item_job.pair_id for item_job in order_item.item_jobs],
         'job_ids' : [item_job.pair.job.id for item_job in order_item.item_jobs],
-        'price' : order_item.price }
+        'price' : order_item.price,
+        'description' : order_item.description }
     
         output.append(item_data)
     

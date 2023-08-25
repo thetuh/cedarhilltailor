@@ -190,6 +190,16 @@ function BtnAddExisting(order_item) {
   garmentSelect.value = order_item.garment_id;
   fetchJobsForGarmentExisting(garmentSelect, jobSelect, order_item.job_ids);
   priceInput.value = order_item.price;
+  newRow.querySelector(".descriptionBox").value = order_item.description;
+
+  const orderItem =
+  {
+    price: order_item.price,
+    jobs: order_item.pair_ids,
+    description: order_item.description
+  };
+
+  newRow.querySelector(".itemArray").value = JSON.stringify(orderItem);
 
   // Add an event listener to handle garment selection updates for dynamically added rows
   if (!newRow.hasAttribute("data-event-listener-added")) {
@@ -421,9 +431,9 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       // easy to add other fields if needed
       const orderItem =
       {
-        price: data.totalPrice,
-        jobs: data.jobPairs,
-        description: descriptionInput
+        price: order_item.price,
+        jobs: order_item.pair_ids,
+        description: order_item.description
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -481,6 +491,16 @@ function populateData()
       firstRowGarmentSelect.value = data.order_items[0].garment_id;
       fetchJobsForGarmentExisting(firstRowGarmentSelect, firstRowJobSelect, data.order_items[0].job_ids);
       firstRowPriceInput.value = data.order_items[0].price;
+      firstRow.querySelector(".descriptionBox").value = data.order_items[0].description;
+
+      const orderItem =
+      {
+        price: data.order_items[0].price,
+        jobs: data.order_items[0].pair_ids,
+        description: data.order_items[0].description
+      };
+
+      firstRow.querySelector(".itemArray").value = JSON.stringify(orderItem);
 
       data.order_items.slice(1).forEach( order_item => {
         BtnAddExisting(order_item);
