@@ -208,9 +208,6 @@ function BtnAddExisting(order_item) {
     {
       overrideTotalPrice(garmentSelect, jobSelect, newRow);
     });
-
-    // Populate the options from the order
-
   }
 
   // Show the "X" button in all rows except the first one
@@ -471,6 +468,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
 const firstRow = document.querySelector("#TBody tr");
 const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
 const firstRowJobSelect = firstRow.querySelector(".jobSelect");
+const firstRowPriceInput = document.getElementById('price');
 const orderId = document.getElementById('order-id').value;
 
 function populateData()
@@ -480,15 +478,16 @@ function populateData()
     .then(data => {
       //console.log(data);
 
-      // populate data on
-      data.order_items.forEach( order_item => {
+      firstRowGarmentSelect.value = data.order_items[0].garment_id;
+      fetchJobsForGarmentExisting(firstRowGarmentSelect, firstRowJobSelect, data.order_items[0].job_ids);
+      firstRowPriceInput.value = data.order_items[0].price;
+
+      data.order_items.slice(1).forEach( order_item => {
         BtnAddExisting(order_item);
       } );
 
     } )
 }
-
-//fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
 
 populateData(firstRowGarmentSelect, firstRowJobSelect);
 
