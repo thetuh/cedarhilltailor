@@ -43,7 +43,7 @@ class OrderItem(db.Model):
     description = db.Column(db.String(255), nullable=True)
 
     # One-to-many (ItemJob)
-    item_jobs = db.relationship('ItemJob', backref='order_item', lazy='joined')
+    item_jobs = db.relationship('ItemJob', backref='order_item', lazy='joined', cascade='all, delete-orphan')
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,14 +55,14 @@ class Order(db.Model):
     status = db.Column(db.SmallInteger, nullable=False, default=OrderStatus.INCOMPLETE)
 
     # One-to-many (OrderItem)
-    order_items = db.relationship('OrderItem', backref='order', lazy='joined')
+    order_items = db.relationship('OrderItem', backref='order', lazy='joined', cascade='all, delete-orphan')
 
 class Garment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
     # Many-to-many (Job)
-    jobs = db.relationship('Job', secondary='garment_job_pair', backref='garments', lazy='dynamic')
+    jobs = db.relationship('Job', secondary='garment_job_pair', backref='garments', lazy='dynamic', viewonly=True)
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)

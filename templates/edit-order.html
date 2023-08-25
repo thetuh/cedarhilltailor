@@ -7,9 +7,9 @@
 <br>
 
 <input type="hidden" id="order-id" value="{{ order.id }}" >
-<input type="hidden" id="deleted-ids" name="deleted[]" class="deletedItemArray">
 
 <form id="myForm" class="needs-validation" novalidate method="POST">
+<input type="hidden" id="deleted-ids" name="deleted[]" class="deletedItemArray">
 <div class="container">
     <div class="card">
         <div class="card-header">
@@ -93,7 +93,7 @@
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
-              <input type="hidden" name="item-id" class="itemId" value="0">
+              <input type="hidden" name="item-id" class="itemId" value="-1">
               <input type="hidden" value="0" class="originalOrder">
             </tr>
           </tbody>
@@ -134,7 +134,7 @@ function BtnAdd() {
   newRow.querySelector(".price").value = "";
   newRow.querySelector(".itemArray").value="";
   newRow.querySelector('.originalOrder').value="0";
-  newRow.querySelector('.itemId').value = "0";
+  newRow.querySelector('.itemId').value = "-1";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -195,7 +195,8 @@ function BtnAddExisting(order_item) {
   {
     price: order_item.price,
     jobs: order_item.pair_ids,
-    description: order_item.description
+    description: order_item.description,
+    item_id: order_item.id
   };
 
   newRow.querySelector(".itemArray").value = JSON.stringify(orderItem);
@@ -455,7 +456,8 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       {
         price: data.totalPrice,
         jobs: data.jobPairs,
-        description: descriptionInput
+        description: descriptionInput,
+        item_id: row.querySelector('.itemId').value
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -487,6 +489,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
         price: priceValue,
         jobs: data.jobPairs,
         description: descriptionInput,
+        item_id: row.querySelector('.itemId').value
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -520,7 +523,8 @@ function populateData()
       {
         price: data.order_items[0].price,
         jobs: data.order_items[0].pair_ids,
-        description: data.order_items[0].description
+        description: data.order_items[0].description,
+        item_id: data.order_items[0].item_id
       };
 
       firstRow.querySelector(".itemArray").value = JSON.stringify(orderItem);

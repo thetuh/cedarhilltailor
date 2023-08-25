@@ -39,12 +39,114 @@ def get_order_items(order_id):
     return { "order_items" : output }
 
 # 'Hard' edit for substantial changes
-@views.route('/edit-order/<int:order_id>')
+@views.route('/edit-order/<int:order_id>', methods=['GET', 'POST'])
 @login_required
 def edit_order_hard(order_id):
     order = Order.query.get_or_404(order_id)
     garment_list = Garment.query.order_by(Garment.name).all()
-    return render_template('edit-order.html', order=order, garment_list=garment_list)
+
+    if request.method == 'GET':
+        return render_template('edit-order.html', order=order, garment_list=garment_list)
+
+    elif request.method == 'POST':
+        first_name = request.form.get('first-name')
+        last_name = request.form.get('last-name')
+        phone_number = request.form.get('phone-number').replace('-', '')
+        completion_date = request.form.get('date')
+
+        errors = []
+
+        # Input Validation
+        if not first_name:
+            errors.append('Please enter a first name')
+        elif not last_name:
+            errors.append('Please enter a last name')
+        elif not phone_number:
+            errors.append('Please enter a phone number')
+        elif not completion_date:
+            errors.append('Please enter a completion date')
+
+        # Error message display
+        if errors:
+            error_message = ' '.join(errors)
+            flash(error_message, category='error')
+            return render_template('edit-order.html', order=order, garment_list=garment_list)
+
+        total_price = 0
+        order_item_json_list = request.form.getlist('item[]')
+        for order_item_json in order_item_json_list:
+                total_price += Decimal(json.loads(order_item_json).get('price'))
+
+        try:
+            # Erase deleted order items
+            deleted_item_json_list = request.form.getlist('deleted[]')
+            for deleted_item_json in deleted_item_json_list:
+                try:
+                    data = json.loads(deleted_item_json)
+                    for idx in data:
+                        order_item = OrderItem.query.get(Decimal(idx))
+                        if order_item:
+                            db.session.delete(order_item)
+
+                    # Synchronize but dont end transaction
+                    db.session.flush()
+
+                except json.JSONDecodeError as e:
+                    pass
+
+            for order_item_entry in order_item_json_list:                
+                order_item_data = json.loads(order_item_entry)
+                # print(order_item_data)
+
+                # This is an existing order item
+                if Decimal(order_item_data.get('item_id')) != -1:
+                    # print('this is an existing order')
+                    # Delete all item jobs (unless we can think of a better way in the future)
+                    existing_item_jobs = ItemJob.query.filter_by(item_id=order_item_data.get('item_id')).all()
+
+                    for existing_item_job in existing_item_jobs:
+                        db.session.delete(existing_item_job)
+                    
+                    db.session.flush()
+
+                    updated_price = order_item_data.get('price')
+                    updated_description = order_item_data.get('description')
+
+                    order_item = OrderItem.query.get_or_404(order_item_data.get('item_id'))
+                    order_item.price = updated_price
+                    order_item.description = updated_description
+
+                    pair_ids = order_item_data.get('jobs')
+                    for pair_id in pair_ids:
+                        new_item_job = ItemJob(item_id=order_item_data.get('item_id'), pair_id=pair_id)
+                        db.session.add(new_item_job)
+                    
+                    db.session.flush()
+                else:
+                    # print('this is not an existing order')
+                    price = order_item_data.get('price')
+                    description = order_item_data.get('description')
+                    
+                    new_order_item = OrderItem(order_id=order_id, price=price, description=description)
+                    db.session.add( new_order_item )
+                    db.session.flush()
+
+                    pair_ids = order_item_data.get('jobs')
+                    for pair_id in pair_ids:
+                        new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id)
+                        db.session.add(new_item_job)
+
+                    db.session.flush()
+
+            flash('Successfully edited order ID #{}'.format(order_id), category='success')
+            db.session.commit()
+
+        except Exception as e:
+            db.session.rollback()  # Rollback the transaction in case of an error
+            flash(f"An error occurred: {str(e)}", category='error')
+            return render_template('edit-order.html', order=order, garment_list=garment_list)
+
+        return render_template('search-order.html', order=order, garment_list=garment_list)
 
 # 'Soft' edit for job status
 @views.route('/search-id/edit', methods=['GET', 'POST'])
