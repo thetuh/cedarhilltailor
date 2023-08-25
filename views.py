@@ -138,6 +138,8 @@ def edit_order_hard(order_id):
 
                     db.session.flush()
 
+            order.price = total_price
+
             flash('Successfully edited order ID #{}'.format(order_id), category='success')
             db.session.commit()
 

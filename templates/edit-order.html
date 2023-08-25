@@ -143,6 +143,7 @@ function BtnAdd() {
   const garmentSelect = newRow.querySelector(".garmentSelect");
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
+  const descriptionInput = newRow.querySelector(".descriptionBox");
 
   garmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(garmentSelect, jobSelect);
@@ -158,6 +159,10 @@ function BtnAdd() {
     overrideTotalPrice(garmentSelect, jobSelect, newRow);
   });
 
+  descriptionInput.addEventListener('input', function() {
+    overrideTotalPrice(garmentSelect, jobSelect, newRow);
+  });
+  
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
   rows.forEach((row) => {
@@ -183,6 +188,7 @@ function BtnAddExisting(order_item) {
   const garmentSelect = newRow.querySelector(".garmentSelect");
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
+  const descriptionInput = newRow.querySelector(".descriptionBox");
 
   garmentSelect.value = order_item.garment_id;
   fetchJobsForGarmentExisting(garmentSelect, jobSelect, order_item.job_ids);
@@ -218,6 +224,10 @@ function BtnAddExisting(order_item) {
     {
       overrideTotalPrice(garmentSelect, jobSelect, newRow);
     });
+
+    descriptionInput.addEventListener('input', function() {
+    overrideTotalPrice(garmentSelect, jobSelect, newRow);
+  });
   }
 
   // Show the "X" button in all rows except the first one
@@ -233,18 +243,21 @@ window.addEventListener("DOMContentLoaded", function () {
   const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
   const firstRowJobSelect = firstRow.querySelector(".jobSelect");
   const firstRowPriceInput = firstRow.querySelector(".price");
+  const firstRowDescriptionInput = firstRow.querySelector('.descriptionBox');
+  
   firstRowGarmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
     firstRowPriceInput.value = "";
   });
   firstRowJobSelect.addEventListener("change", function () {
-      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
-    });
-
-    firstRowPriceInput.addEventListener('input', function()
-    {
-      overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
-    });
+    calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+  });
+  firstRowPriceInput.addEventListener('input', function() {
+    overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+  });
+  firstRowDescriptionInput.addEventListener('input', function() {
+    overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+  });
 });
 
   // Hide the "X" button in the last row if there's only one row left
