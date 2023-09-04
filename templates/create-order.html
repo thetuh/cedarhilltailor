@@ -59,7 +59,7 @@
           <thead class="thead-light">
             <tr>
               <th scope="col">Item</th>
-              <th scope="col">Description</th>
+              <th scope="col">Details</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -86,7 +86,13 @@
                 </div>            
               </td>
               <td style="width: 25%; position: relative;">
-                <textarea name="description" style="position: absolute; height: 96%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input photo" id="inputGroupFile01">
+                  <label class="custom-file-label photoLabel" for="inputGroupFile01">Upload image</label>
+                </div>
+                <br>
+                <br>
+                <textarea placeholder="Optional description" name="description" style="position: absolute; height: 72%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
@@ -128,6 +134,9 @@ function BtnAdd() {
   newRow.querySelector(".descriptionBox").value = "";
   newRow.querySelector(".price").value = "";
   newRow.querySelector(".itemArray").value="";
+  newRow.querySelector(".photo").value="";
+  newRow.querySelector('.photoLabel').value="";
+  newRow.querySelector('.photoLabel').innerHTML = "Upload image";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -137,6 +146,7 @@ function BtnAdd() {
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
   const descriptionInput = newRow.querySelector(".descriptionBox");
+  const photoInput = newRow.querySelector('.photo');
 
   garmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(garmentSelect, jobSelect);
@@ -156,6 +166,19 @@ function BtnAdd() {
     overrideTotalPrice(garmentSelect, jobSelect, newRow);
   });
 
+  phoneInput.addEventListener('change', function() {
+    overrideTotalPrice(garmentSelect, jobSelect, newRow);
+  });
+
+  photoInput.addEventListener('change', function() {
+    overrideTotalPrice(garmentSelect, jobSelect, newRow);
+    
+    // Extract and display only the filename
+    const fullPath = photoInput.value;
+    const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
+    newRow.querySelector('.photoLabel').innerHTML = filename;
+  });
+
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
   rows.forEach((row) => {
@@ -170,6 +193,7 @@ window.addEventListener("DOMContentLoaded", function () {
   const firstRowJobSelect = firstRow.querySelector(".jobSelect");
   const firstRowPriceInput = firstRow.querySelector(".price");
   const firstRowDescriptionInput = firstRow.querySelector('.descriptionBox');
+  const firstRowPhotoInput = firstRow.querySelector('.photo');
 
   firstRowGarmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
@@ -183,6 +207,14 @@ window.addEventListener("DOMContentLoaded", function () {
   });
   firstRowDescriptionInput.addEventListener('input', function() {
     overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+  });
+  firstRowPhotoInput.addEventListener('change', function() {
+    overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+    
+    // Extract and display only the filename
+    const fullPath = firstRowPhotoInput.value;
+    const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
+    firstRow.querySelector('.photoLabel').innerHTML = filename;
   });
 });
 
@@ -323,6 +355,7 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
   const priceInput = row.querySelector(".price");
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
+  const photoInput = row.querySelector('.photo').value;
 
   if ( !selectedJobIds.length || !garmentId )
   {
@@ -341,7 +374,8 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       {
         price: data.totalPrice,
         jobs: data.jobPairs,
-        description: descriptionInput
+        description: descriptionInput,
+        photo: photoInput
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -359,6 +393,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
   const priceValue = row.querySelector(".price").value;
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
+  const photoInput = row.querySelector('.photo').value;
 
  if ( !selectedJobIds.length || !garmentId )
     return;
@@ -373,7 +408,8 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
       {
         price: priceValue,
         jobs: data.jobPairs,
-        description: descriptionInput
+        description: descriptionInput,
+        photo: photoInput
       };
 
       itemInput.value = JSON.stringify(orderItem);

@@ -8,6 +8,7 @@ from models import User, Role, Garment, Job, GarmentJobPair, Order, OrderItem, C
 from application import application, db
 from datetime import datetime
 from decimal import Decimal
+import boto3
 import json
 
 views = Blueprint('views', __name__)
