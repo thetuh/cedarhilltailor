@@ -180,24 +180,16 @@ def search_id(order_id):
 
 @views.route('/search-number/<phone_number>')
 def search_number(phone_number):
+    phone_number = phone_number.replace('-', '')
+
     page, per_page, offset = get_page_args(page_parameter='page',
                                             per_page_parameter='per_page')
+
     per_page = MAX_ITEMS_PER_PAGE
-    
-    order_pagination = None  # Initialize the variable
-    
-    try:
-        # Query orders with customers whose phone numbers match the given phone number
-        order_pagination = Order.query \
-            .join(Customer) \
-            .options(joinedload(Order.customer)) \
-            .filter(Customer.phone_number == phone_number) \
-            .paginate(page=page, per_page=per_page)
-    except Exception:
-        print("No orders found for the given phone number.")
+
+    order_pagination = Customer.query.filter_by(phone_number=phone_number).paginate(page=page, per_page=per_page)
 
     return render_template('search-number.html', order_pagination=order_pagination, phone_number=phone_number)
-
 
 @views.route('/search-order')
 def search_order():
