@@ -180,14 +180,19 @@ def search_id(order_id):
 
 @views.route('/search-number/<phone_number>')
 def search_number(phone_number):
-    phone_number = phone_number.replace('-', '')
+    stripped_phone_number = phone_number.replace('-', '')
 
     page, per_page, offset = get_page_args(page_parameter='page',
                                             per_page_parameter='per_page')
 
     per_page = MAX_ITEMS_PER_PAGE
 
-    order_pagination = Customer.query.filter_by(phone_number=phone_number).paginate(page=page, per_page=per_page)
+    cid = -1
+    customer = Customer.query.filter_by(phone_number=stripped_phone_number).order_by(Customer.id.desc()).first()
+    if customer:
+        cid = customer.id
+
+    order_pagination = Order.query.filter_by(customer_id=cid).paginate(page=page, per_page=per_page)
 
     return render_template('search-number.html', order_pagination=order_pagination, phone_number=phone_number)
 
