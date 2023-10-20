@@ -87,7 +87,7 @@
               </td>
               <td style="width: 25%; position: relative;">
 <!--                 <div class="custom-file">
-                  <input type="file" class="custom-file-input photo" id="inputGroupFile01">
+                  <input class="custom-file-input photo" id="inputGroupFile01">
                   <label class="custom-file-label photoLabel" for="inputGroupFile01">Upload image</label>
                 </div>
                 <br>
@@ -135,8 +135,8 @@ function BtnAdd() {
   newRow.querySelector(".price").value = "";
   newRow.querySelector(".itemArray").value="";
   newRow.querySelector(".photo").value="";
-  newRow.querySelector('.photoLabel').value="";
-  newRow.querySelector('.photoLabel').innerHTML = "Upload image";
+/*   newRow.querySelector('.photoLabel').value="";
+  newRow.querySelector('.photoLabel').innerHTML = "Upload image"; */
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -170,14 +170,14 @@ function BtnAdd() {
     overrideTotalPrice(garmentSelect, jobSelect, newRow);
   });
 
-  photoInput.addEventListener('change', function() {
+/*   photoInput.addEventListener('change', function() {
     overrideTotalPrice(garmentSelect, jobSelect, newRow);
     
     // Extract and display only the filename
     const fullPath = photoInput.value;
     const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
-    newRow.querySelector('.photoLabel').innerHTML = filename;
-  });
+   newRow.querySelector('.photoLabel').innerHTML = filename;
+  }); */
 
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
@@ -208,14 +208,14 @@ window.addEventListener("DOMContentLoaded", function () {
   firstRowDescriptionInput.addEventListener('input', function() {
     overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
   });
-  firstRowPhotoInput.addEventListener('change', function() {
+/*   firstRowPhotoInput.addEventListener('change', function() {
     overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
     
     // Extract and display only the filename
     const fullPath = firstRowPhotoInput.value;
     const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
     firstRow.querySelector('.photoLabel').innerHTML = filename;
-  });
+  }); */
 });
 
   // Hide the "X" button in the last row if there's only one row left
@@ -355,7 +355,7 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
   const priceInput = row.querySelector(".price");
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
-  const photoInput = row.querySelector('.photo').value;
+/*   const photoInput = row.querySelector('.photo').value; */
 
   if ( !selectedJobIds.length || !garmentId )
   {
@@ -375,7 +375,7 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
         price: data.totalPrice,
         jobs: data.jobPairs,
         description: descriptionInput,
-        photo: photoInput
+/*         photo: photoInput */
       };
 
       itemInput.value = JSON.stringify(orderItem);
@@ -393,7 +393,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
   const priceValue = row.querySelector(".price").value;
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
-  const photoInput = row.querySelector('.photo').value;
+/*   const photoInput = row.querySelector('.photo').value; */
 
  if ( !selectedJobIds.length || !garmentId )
     return;
@@ -409,7 +409,7 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
         price: priceValue,
         jobs: data.jobPairs,
         description: descriptionInput,
-        photo: photoInput
+/*         photo: photoInput */
       };
 
       itemInput.value = JSON.stringify(orderItem);
