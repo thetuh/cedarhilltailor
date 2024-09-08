@@ -92,7 +92,7 @@
                 </div>
                 <br>
                 <br> -->
-                <textarea placeholder="Optional description" name="description" style="position: absolute; height: 72%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
+                <textarea name="description" style="position: absolute; height: 72%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
               </td>
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
@@ -107,6 +107,12 @@
         <div class="md-form md-outline input-with-post-icon datepicker">
           <input placeholder="Select date" name="date" type="date" id="example" class="form-control form-control-sm" required>
         </div>
+        <br>
+        <div id="price" class="text-md-right">
+          <p name="subtotal" class="font-weight-normal">Subtotal: </p>
+          <p name="sales_tax" class="font-weight-normal">Sales tax: </p>
+          <p name="total_price" class="font-weight-bold">Total price: </p>
+      </div>
       </div>
   </div>
 </div>
@@ -379,6 +385,15 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       };
 
       itemInput.value = JSON.stringify(orderItem);
+
+      const subtotalElement = document.querySelector('p[name="subtotal"]');
+      const salesTaxElement = document.querySelector('p[name="sales_tax"]');
+      const totalPriceElement = document.querySelector('p[name="total_price"]');
+      
+      subtotalElement.textContent = 'Subtotal: $100.00';
+      salesTaxElement.textContent = 'Sales tax: $10.00';
+      totalPriceElement.textContent = 'Total price: $110.00';
+
     })
     .catch(error => {
       console.error('Error calculating total price:', error);

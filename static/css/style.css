@@ -11,6 +11,13 @@
     justify-content: center;
 }
 
+#price
+{
+    display: block;
+    margin-bottom: 5px;
+    justify-content: flex-end;
+}
+
 #phone:focus:valid {
     border-color: green;
 }

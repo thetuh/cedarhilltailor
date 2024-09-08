@@ -8,6 +8,7 @@ from models import User, Role, Garment, Job, GarmentJobPair, Order, OrderItem, C
 from application import application, db
 from datetime import datetime
 from decimal import Decimal
+import traceback
 import boto3
 import json
 
@@ -76,7 +77,7 @@ def edit_order_hard(order_id):
         total_price = 0
         order_item_json_list = request.form.getlist('item[]')
         for order_item_json in order_item_json_list:
-                total_price += Decimal(json.loads(order_item_json).get('price'))
+            total_price += Decimal(json.loads(order_item_json).get('price'))
 
         try:
             # Erase deleted order items
@@ -86,7 +87,7 @@ def edit_order_hard(order_id):
                     data = json.loads(deleted_item_json)
                     for idx in data:
                         order_item = OrderItem.query.get(Decimal(idx))
-                        if order_item:
+                        if order_item is not None:
                             db.session.delete(order_item)
 
                     # Synchronize but dont end transaction
@@ -99,9 +100,13 @@ def edit_order_hard(order_id):
                 order_item_data = json.loads(order_item_entry)
                 # print(order_item_data)
 
+                item_id_field = order_item_data.get('item_id')
+                if item_id_field is None:
+                    print("none")
+                
                 # This is an existing order item
-                if Decimal(order_item_data.get('item_id')) != -1:
-                    # print('this is an existing order')
+                if item_id_field and Decimal(item_id_field) != -1:
+                    print('this is an existing order')
                     # Delete all item jobs (unless we can think of a better way in the future)
                     existing_item_jobs = ItemJob.query.filter_by(item_id=order_item_data.get('item_id')).all()
 
@@ -124,7 +129,7 @@ def edit_order_hard(order_id):
                     
                     db.session.flush()
                 else:
-                    # print('this is not an existing order')
+                    print('this is not an existing order')
                     price = order_item_data.get('price')
                     description = order_item_data.get('description')
                     
@@ -146,7 +151,8 @@ def edit_order_hard(order_id):
 
         except Exception as e:
             db.session.rollback()  # Rollback the transaction in case of an error
-            flash(f"An error occurred: {str(e)}", category='error')
+            error_message = f"An error occurred: {str(e)} at line {traceback.extract_tb(e.__traceback__)[0][1]}"
+            flash(error_message, category='error')
             return render_template('edit-order.html', order=order, garment_list=garment_list)
 
         return render_template('search-order.html', order=order, garment_list=garment_list)
