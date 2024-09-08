@@ -362,7 +362,10 @@ def edit_jobs():
 @login_required
 @manager_required
 def edit_pairs():
-    return render_template('pairs.html')
+
+    garment_list = Garment.query.order_by(Garment.name).all()
+
+    return render_template('pairs.html', garment_list=garment_list)
 
 # [ ADMIN ] ---
 

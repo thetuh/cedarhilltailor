@@ -6,13 +6,15 @@
 <h1 align="center">Pairs</h1>
 <br>
 
-<form class="needs-validation" novalidate id="order-form">
-<div class="input-group input-group-sm mb-3">
-    <input type="text" class="form-control" name="order-id" id="order-id" placeholder="Search by order ID" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
-    <div class="input-group-append">
-      <button class="btn btn-primary" type="submit">Search</button>
-    </div>
+<p style="text-align:center">Garment</h1>
+<select class="custom-select custom-select-sm garmentSelect" required name="garment[]">
+    {% for garment in garment_list %}
+      <option value="{{ garment.id }}">{{ garment.name }}</option>
+    {% endfor %}
+</select>
+
+<div id="wrapper">
+<button type="submit" class="btn btn-primary">Display job pairs</button>
 </div>
-</form>
 
 {% endblock %}
