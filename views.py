@@ -322,25 +322,25 @@ def calculate_total_price(garment_id, job_ids):
             
     return jsonify({"totalPrice": total_price, "jobPairs": job_pairs })
 
-@views.route('/services')
+@views.route('/inventory')
 @login_required
 @manager_required
-def manage_services():
-    return render_template('services.html')
+def manage_inventory():
+    return render_template('inventory.html')
 
-@views.route('/services/garments')
+@views.route('/inventory/garments')
 @login_required
 @manager_required
 def manage_garments():
     return render_template('garments.html')
 
-@views.route('/services/jobs')
+@views.route('/inventory/jobs')
 @login_required
 @manager_required
 def manage_jobs():
     return render_template('jobs.html')
 
-@views.route('/services/garments/edit')
+@views.route('/inventory/garments/edit')
 @login_required
 @manager_required
 def edit_garments():
@@ -354,7 +354,7 @@ def edit_garments():
 
     return render_template('edit-garments.html', garments_pagination=garments_pagination)
 
-@views.route('/services/jobs/edit')
+@views.route('/inventory/jobs/edit')
 @login_required
 @manager_required
 def edit_jobs():

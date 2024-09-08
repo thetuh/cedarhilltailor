@@ -1,0 +1,3 @@
+* add pricing based on garment/job selection(s) and sales tax
+* add garment/job/pair creation, modification, and deletion
+* finish order status

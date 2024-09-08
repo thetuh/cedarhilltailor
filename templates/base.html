@@ -42,7 +42,7 @@
                   {% endif %}
                   <a class="nav-item nav-link" id="search-order" href="/search-order">Search order</a>
                   {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
-                      <a class="nav-item nav-link" id="services" href="/services">Services</a>
+                      <a class="nav-item nav-link" id="inventory" href="/inventory">Inventory</a>
                   {% endif %}
                   {% if has_role(current_user, 'admin') %}
                       <a class="nav-item nav-link" id="users" href="/users">Users</a>
