@@ -331,18 +331,6 @@ def manage_inventory():
 @views.route('/inventory/garments')
 @login_required
 @manager_required
-def manage_garments():
-    return render_template('garments.html')
-
-@views.route('/inventory/jobs')
-@login_required
-@manager_required
-def manage_jobs():
-    return render_template('jobs.html')
-
-@views.route('/inventory/garments/edit')
-@login_required
-@manager_required
 def edit_garments():
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
@@ -352,9 +340,9 @@ def edit_garments():
     # Query the Garment table and get paginated data
     garments_pagination = Garment.query.order_by(Garment.name).paginate(page=page, per_page=per_page)
 
-    return render_template('edit-garments.html', garments_pagination=garments_pagination)
+    return render_template('garments.html', garments_pagination=garments_pagination)
 
-@views.route('/inventory/jobs/edit')
+@views.route('/inventory/jobs')
 @login_required
 @manager_required
 def edit_jobs():
@@ -368,7 +356,13 @@ def edit_jobs():
     # Query the Garment table and get paginated data
     jobs_pagination = Job.query.order_by(Job.name).paginate(page=page, per_page=per_page)
 
-    return render_template('edit-jobs.html', jobs_pagination=jobs_pagination, garment_list=garment_list)
+    return render_template('jobs.html', jobs_pagination=jobs_pagination, garment_list=garment_list)
+
+@views.route('/inventory/pairs')
+@login_required
+@manager_required
+def edit_pairs():
+    return render_template('pairs.html')
 
 # [ ADMIN ] ---
 

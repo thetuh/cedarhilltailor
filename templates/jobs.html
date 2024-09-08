@@ -6,23 +6,42 @@
 <h1 align="center">Jobs</h1>
 <br>
 
+<table class="table table-striped table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs_pagination.items %}
+            <tr>
+                <td width="50%">{{ job.name }}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{job.id}}">Edit name</button>
+                    <button class="btn btn-sm btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{job.id}}">Delete</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <div id="wrapper">
-    <a href="/inventory/jobs/edit" class="btn btn-primary" role="button">View/Edit</a>
-    <a href="/inventory/jobs/create" class="btn btn-primary" role="button">Create</a>
+    <!-- Use a button element with type="button" to trigger the modal -->
+    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalcreate">Create</button>
 </div>
 
-<style>
+<br>
 
-#wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* To center-align buttons horizontally */
-    }
+<!-- <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+    <ul class="pagination">
+        {% for page_num in jobs_pagination.iter_pages() %}
+            <li class="page-item {% if page_num == jobs_pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('views.edit_jobs', page=page_num) }}">{{ page_num }}</a>
+            </li>
+        {% endfor %}        
+    </ul>
+</nav>
+ -->
 
-    .btn {
-        margin-bottom: 20px; /* Add some spacing between buttons */
-    }
-
-</style>
-
-{% endblock %}
+ {% endblock %}
