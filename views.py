@@ -422,6 +422,66 @@ def delete_user(id):
     flash(f"Successfully deleted '{user.username}'", category='success')
     return redirect(url_for('views.manage_users'))
 
+@views.route('/inventory/garments/create', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_garment():
+    if request.method == 'POST':
+        name = request.form.get('name')
+
+        error = []
+
+        if not name:
+            error.append('Please enter a valid name')
+
+        garment = Garment.query.filter_by(name=name).first()
+        if garment:
+            error.append(f"Garment '{name}' already exists")
+
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
+            return redirect(url_for('views.garments'))
+
+        new_garment = Garment(name=name)
+        db.session.add(new_garment)
+        db.session.commit()
+
+        flash(f"Successfully added '{name}'", category='success')
+        return redirect(url_for('views.garments'))
+    
+    return render_template('garments.html')
+
+@views.route('/inventory/jobs/create', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_job():
+    if request.method == 'POST':
+        name = request.form.get('name')
+
+        error = []
+
+        if not name:
+            error.append('Please enter a valid name')
+
+        job = Job.query.filter_by(name=name).first()
+        if job:
+            error.append(f"job '{name}' already exists")
+
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
+            return redirect(url_for('views.jobs'))
+
+        new_job = Job(name=name)
+        db.session.add(new_job)
+        db.session.commit()
+
+        flash(f"Successfully added '{name}'", category='success')
+        return redirect(url_for('views.jobs'))
+    
+    return render_template('jobs.html')
+
 @views.route('/users/create', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -461,7 +521,7 @@ def create_user():
         flash(f"Successfully added '{username}'", category='success')
         return redirect(url_for('views.manage_users')) 
 
-    return render_template('create-user.html')
+    return render_template('users.html')
 
 @views.route('/inventory/garments/edit', methods=['GET', 'POST'])
 @login_required

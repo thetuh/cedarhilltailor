@@ -52,11 +52,31 @@
 </table>
 
 <div id="wrapper">
-    <!-- Use a button element with type="button" to trigger the modal -->
     <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalcreate">Create</button>
 </div>
 
-<br>
+<div id="modalcreate" class="modal fade" role="dialog" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create job</h4>
+                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for('views.create_job')}}" method="POST">
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div id="wrapper">
+                        <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
+                        <button style='margin-right:16px' type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>     
+                </form>                                                                  
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
