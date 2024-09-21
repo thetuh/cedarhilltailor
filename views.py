@@ -331,7 +331,7 @@ def manage_inventory():
 @views.route('/inventory/garments')
 @login_required
 @manager_required
-def edit_garments():
+def garments():
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
 
@@ -345,7 +345,7 @@ def edit_garments():
 @views.route('/inventory/jobs')
 @login_required
 @manager_required
-def edit_jobs():
+def jobs():
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
 
@@ -376,6 +376,36 @@ def manage_users():
     users = User.query.filter(not_(User.username == 'admin')).order_by(User.role_id.asc()).all()
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
+
+@views.route('/inventory/garments/delete/<int:id>')
+@login_required
+@admin_required
+def delete_garment(id):
+    garment = Garment.query.get(id)
+    if not garment:
+        flash('Garment not found', category='error')
+        return redirect(url_for('views.garments'))
+
+    db.session.delete(garment)
+    db.session.commit()
+
+    flash(f"Successfully deleted' '{garment.name}'", category='success')
+    return redirect(url_for('views.garments'))
+
+@views.route('/inventory/jobs/delete/<int:id>')
+@login_required
+@admin_required
+def delete_job(id):
+    job = Job.query.get(id)
+    if not job:
+        flash('job not found', category='error')
+        return redirect(url_for('views.jobs'))
+
+    db.session.delete(job)
+    db.session.commit()
+
+    flash(f"Successfully deleted' '{job.name}'", category='success')
+    return redirect(url_for('views.jobs'))
 
 @views.route('/users/delete/<int:id>')
 @login_required
@@ -432,6 +462,64 @@ def create_user():
         return redirect(url_for('views.manage_users')) 
 
     return render_template('create-user.html')
+
+@views.route('/inventory/garments/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_garment():
+    if request.method == 'POST':
+        garment_id = request.form.get('id')
+        garment = Garment.query.get(garment_id)
+
+        name = request.form.get('name')
+    
+        error=[]
+
+        if not name:
+            error.append('Please enter a valid name')
+
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
+            return redirect(url_for('views.garments'))
+
+        garment.name = name
+
+        db.session.commit()
+
+        flash(f"Successfully updated '{garment.name}'", category='success')
+        return redirect(url_for('views.garments'))
+
+    return render_template('garments.html')
+
+@views.route('/inventory/jobs/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_job():
+    if request.method == 'POST':
+        job_id = request.form.get('id')
+        job = Job.query.get(job_id)
+
+        name = request.form.get('name')
+    
+        error=[]
+
+        if not name:
+            error.append('Please enter a valid name')
+
+        if error:
+            error_message = ' '.join(error)
+            flash(error_message, category='error')
+            return redirect(url_for('views.jobs'))
+
+        job.name = name
+
+        db.session.commit()
+
+        flash(f"Successfully updated '{job.name}'", category='success')
+        return redirect(url_for('views.jobs'))
+
+    return render_template('jobs.html')
 
 @views.route('/users/edit', methods=['GET', 'POST'])
 @login_required

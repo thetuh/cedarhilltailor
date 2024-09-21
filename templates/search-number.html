@@ -10,7 +10,6 @@
     <thead>
         <tr>
             <th>Order ID</th>
-            <th>Customer ID</th>
             <th>Order date</th>
             <th>Completion date</th>
             <th>Status</th>
@@ -21,7 +20,6 @@
         {% for order in order_pagination.items %}
             <tr>
                 <td>{{ order.id }}</td>
-                <td>{{ order.customer_id }}</td>
                 <td>{{ order.order_date }}</td>
                 <td>{{ order.completion_date }}</td>
                 <td>
