@@ -356,24 +356,22 @@ def jobs():
 @login_required
 @manager_required
 def pairs():
-    job_list = Job.query.order_by(Job.name).all()
     garment_list = Garment.query.order_by(Garment.name).all()
+    job_list = Job.query.order_by(Job.name).all()
+
     garment_job_pairs = []
-    
+    garment_id = None  # Initialize garment_id to None
+
     if request.method == 'POST':
         garment_id = request.form.get('garment_id')
         if garment_id:
             garment_job_pairs = GarmentJobPair.query.filter_by(garment_id=garment_id).all()
 
-    return render_template('pairs.html', garment_list=garment_list, garment_job_pairs=garment_job_pairs, job_list=job_list)
-
-@views.route('/inventory/pairs')
-@login_required
-@manager_required
-def edit_pairs():
-    garment_list = Garment.query.order_by(Garment.name).all()
-    job_list = Job.query.order_by(Job.name).all()
-    return render_template('pairs.html', garment_list=garment_list, job_list=job_list)
+    return render_template('pairs.html', 
+                           garment_list=garment_list, 
+                           garment_job_pairs=garment_job_pairs, 
+                           job_list=job_list, 
+                           garment_id=garment_id)  # Pass garment_id to the template
 
 # [ ADMIN ROUTES ] -----------------------------------------------
 @views.route('/users')

@@ -11,7 +11,7 @@
     <form method="POST" class="mb-3">
         <select class="custom-select custom-select-sm garmentSelect" required name="garment_id" id="garmentSelect">
             {% for garment in garment_list %}
-              <option value="{{ garment.id }}">{{ garment.name }}</option>
+              <option value="{{ garment.id }}" {% if garment.id|string == garment_id %}selected{% endif %}>{{ garment.name }}</option>
             {% endfor %}
         </select>
 
@@ -40,7 +40,7 @@
             {% endfor %}
         </tbody>
     </table>
-{% else %}
+{% elif garment_id %}
     <p class="text-center mt-4">No pairs found for the selected garment.</p>
 {% endif %}
 
