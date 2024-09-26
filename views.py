@@ -281,6 +281,10 @@ def edit_order_hard(order_id):
                 total_price += Decimal(order_item_data.get('price', 0))
                 process_order_item(order_item_data, order_id=order.id)
 
+            # Define sales tax rate (e.g., 8.26% tax)
+            sales_tax_rate = Decimal('0.0826')  # Adjust this as needed
+            total_price += sales_tax_rate * total_price
+
             # Update order price
             order.price = total_price
             order.completion_date = completion_date  # Update the completion date

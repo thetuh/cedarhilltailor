@@ -106,6 +106,12 @@
         <div class="md-form md-outline input-with-post-icon datepicker">
           <input placeholder="Select date" value="{{ order.completion_date }}" name="date" type="date" id="example" class="form-control form-control-sm" required>
         </div>
+        <br>
+        <div id="price" class="text-md-right">
+          <p name="subtotal" class="font-weight-normal">Subtotal: </p>
+          <p name="sales_tax" class="font-weight-normal">Sales tax: </p>
+          <p name="total_price" class="font-weight-bold">Total price: </p>
+        </div>
       </div>
   </div>
 </div>
@@ -122,6 +128,9 @@
 <br>
 
 <script>
+
+// Initialize an array to hold the total prices of each item
+let itemTotalPrices = [];
 
 function BtnAdd() {
   // Clone the first row
@@ -168,6 +177,9 @@ function BtnAdd() {
   rows.forEach((row) => {
     row.querySelector(".btn-delete").style.display = "inline-block";
   });
+
+  // Recalculate total order price
+  calculateOrderTotal();
 }
 
 function BtnAddExisting(order_item) {
@@ -235,6 +247,9 @@ function BtnAddExisting(order_item) {
   rows.forEach((row) => {
     row.querySelector(".btn-delete").style.display = "inline-block";
   });
+
+  // Recalculate total order price
+  calculateOrderTotal();
 }
 
 // Attach the event listener to the first row when the page loads
@@ -297,6 +312,8 @@ function BtnDel(button) {
   } 
 
   // Remove the row from the table body
+  const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+  itemTotalPrices.splice(rowIndex, 1); // Remove the corresponding price from the array
   row.remove();
 
   // Hide the "X" button in the last row if there's only one row left
@@ -304,6 +321,9 @@ function BtnDel(button) {
   if (rows.length === 1) {
     rows[0].querySelector(".btn-delete").style.display = "none";
   }
+
+  // Update order total after deletion
+  calculateOrderTotal();
 }
 
 // Get the input element
@@ -466,6 +486,10 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
     .then(data => {
       priceInput.value = data.totalPrice;
 
+      // Update the itemTotalPrices array
+      const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+      itemTotalPrices[rowIndex] = data.totalPrice;
+
       // easy to add other fields if needed
       const orderItem =
       {
@@ -476,10 +500,28 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
       };
 
       itemInput.value = JSON.stringify(orderItem);
+
+      // Update order total
+      calculateOrderTotal();
     })
     .catch(error => {
       console.error('Error calculating total price:', error);
     });
+}
+
+// Function to calculate the total order price
+function calculateOrderTotal() {
+  const totalPriceElement = document.querySelector('p[name="total_price"]');
+  const subtotalElement = document.querySelector('p[name="subtotal"]');
+  const salesTaxElement = document.querySelector('p[name="sales_tax"]');
+
+  const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
+  const salesTax = total * 0.0826; //
+  const subtotal = total;
+
+  subtotalElement.textContent = `Subtotal: $${subtotal.toFixed(2)}`;
+  salesTaxElement.textContent = `Sales tax: $${salesTax.toFixed(2)}`;
+  totalPriceElement.textContent = `Total price: $${(subtotal + salesTax).toFixed(2)}`;
 }
 
 function overrideTotalPrice(garmentSelect, jobSelect, row)
@@ -497,6 +539,9 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
   fetch(`/get_job_pairs/${garmentId}/${selectedJobIds.join(",")}`)
     .then(response => response.json())
     .then(data => {
+      // Update the itemTotalPrices array
+      const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+      itemTotalPrices[rowIndex] = priceValue;
 
       // easy to add other fields if needed
       const orderItem =
@@ -508,6 +553,9 @@ function overrideTotalPrice(garmentSelect, jobSelect, row)
       };
 
       itemInput.value = JSON.stringify(orderItem);
+
+      // Update order total
+      calculateOrderTotal();
     })
     .catch(error => {
       console.error('Error retrieving job pairs:', error);
