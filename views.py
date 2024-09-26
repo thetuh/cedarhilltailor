@@ -41,12 +41,20 @@ def process_order_item(order_item_data, order_id):
     else:  # New order item
         new_order_item = OrderItem(order_id=order_id, price=price, description=description)
         db.session.add(new_order_item)
+        db.session.flush()  # Flush to get new_order_item.id
+
+        order_item = new_order_item  # Assign new_order_item to order_item for job pairs processing
 
     # Handle job pairs if needed
     pair_ids = order_item_data.get('jobs', [])
     for pair_id in pair_ids:
-        new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id)
-        db.session.add(new_item_job)
+        # Check if this pair already exists
+        existing_item_job = ItemJob.query.filter_by(item_id=order_item.id, pair_id=pair_id).first()
+
+        if not existing_item_job:
+            job_status = JobStatus.INCOMPLETE.value  # Convert enum to its integer value
+            new_item_job = ItemJob(item_id=order_item.id, pair_id=pair_id, status=job_status)  # use order_item.id
+            db.session.add(new_item_job)
 
 # [ GUEST / SEAMSTRESS ROUTES ] -----------------------------------------------
 @views.route('/')
@@ -116,15 +124,10 @@ def edit_order():
             flash('Order not found', category='error')
             return redirect(url_for('views.search_id'))
 
-    print('nice')
         # Add code to handle editing the order
     return redirect(url_for('views.search_id'))
 
 # [ MANAGER ROUTES ] ---------------------------------------------
-from datetime import datetime
-from decimal import Decimal
-import json
-
 @views.route('/create-order', methods=['GET', 'POST'])
 @login_required
 @manager_required
@@ -222,10 +225,16 @@ def edit_order_hard(order_id):
         first_name = request.form.get('first-name')
         last_name = request.form.get('last-name')
         phone_number = request.form.get('phone-number').replace('-', '')
-        completion_date = request.form.get('date')
+        completion_date_str = request.form.get('date')
+
+        try:
+            completion_date = datetime.strptime(completion_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            flash('Invalid completion date format. Please use YYYY-MM-DD.', category='error')
+            return render_template('edit-order.html', order=order, garment_list=garment_list)
 
         # Validate inputs
-        errors = validate_order_input(first_name, last_name, phone_number, completion_date)
+        errors = validate_order_input(first_name, last_name, phone_number, completion_date_str)
         if errors:
             flash(' '.join(errors), category='error')
             return render_template('edit-order.html', order=order, garment_list=garment_list)
@@ -234,31 +243,47 @@ def edit_order_hard(order_id):
         order_item_json_list = request.form.getlist('item[]')
 
         try:
-            # Erase deleted order items
+            # Remove existing item jobs before updating
+            existing_order_items = OrderItem.query.filter(OrderItem.order_id == order.id).all()
+            existing_item_job_ids = [item.id for item in existing_order_items]
+            ItemJob.query.filter(ItemJob.item_id.in_(existing_item_job_ids)).delete()
+
             deleted_item_json_list = request.form.getlist('deleted[]')
             for deleted_item_json in deleted_item_json_list:
                 try:
+                    # Ensure data is valid JSON
                     data = json.loads(deleted_item_json)
-                    for item_id in data:
-                        order_item = OrderItem.query.get(Decimal(item_id))
-                        if order_item:
-                            db.session.delete(order_item)
+                    
+                    # Check if data is a list of item IDs
+                    if isinstance(data, list):
+                        for item_id in data:
+                            try:
+                                order_item = OrderItem.query.get(Decimal(item_id))
+                                if order_item:
+                                    db.session.delete(order_item)
+                            except ValueError:
+                                flash(f"Invalid item ID format: {item_id}", category='error')
+                    else:
+                        flash('Invalid format for deleted items. Expected a list.', category='error')
+
                 except json.JSONDecodeError:
-                    flash('Error decoding deleted items', category='error')
+                    flash('Error decoding deleted items. Ensure valid JSON format.', category='error')
+
 
             # Process order items
             for order_item_entry in order_item_json_list:
                 order_item_data = json.loads(order_item_entry)
-                total_price += Decimal(order_item_data.get('price', 0))  # Safeguard against missing price
-                process_order_item(order_item_data, order_id=order_id)
+                total_price += Decimal(order_item_data.get('price', 0))
+                process_order_item(order_item_data, order_id=order.id)
 
             # Update order price
             order.price = total_price
-            db.session.commit()  # Commit after all operations
+            order.completion_date = completion_date  # Update the completion date
+            db.session.commit()
             flash(f'Successfully edited order ID #{order_id}', category='success')
 
         except Exception as e:
-            db.session.rollback()  # Rollback the transaction in case of an error
+            db.session.rollback()
             error_message = f"An error occurred: {str(e)} at line {traceback.extract_tb(e.__traceback__)[0][1]}"
             flash(error_message, category='error')
 
@@ -603,7 +628,7 @@ def create_garment_job_pair():
 
         if errors:
             flash(' '.join(errors), category='error')
-            return redirect(url_for('views.edit_pairs'))
+            return redirect(url_for('views.pairs'))
 
         try:
             new_pair = GarmentJobPair(garment_id=garment_id, job_id=job_id, price=Decimal(price))
@@ -614,12 +639,11 @@ def create_garment_job_pair():
             db.session.rollback()
             flash(f'An error occurred: {str(e)}', category='error')
 
-        return redirect(url_for('views.edit_pairs'))
+        return redirect(url_for('views.pairs'))
 
-    # For GET requests, fetch necessary data for the form
     garment_list = Garment.query.order_by(Garment.name).all()
     job_list = Job.query.order_by(Job.name).all()
-    return render_template('create-garment-job-pair.html', garment_list=garment_list, job_list=job_list)
+    return render_template('pairs.html', garment_list=garment_list, job_list=job_list)
 
 @views.route('/users/edit', methods=['GET', 'POST'])
 @login_required
