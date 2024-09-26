@@ -130,19 +130,20 @@
 
 <script>
 
+// Initialize an array to hold the total prices of each item
+let itemTotalPrices = [];
+
+// Function to add a new row
 function BtnAdd() {
   // Clone the first row
   const newRow = document.getElementById("TRow").cloneNode(true);
-
+  
   // Clear the selection in the cloned row
   newRow.querySelector(".garmentSelect").selectedIndex = 0;
   newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
   newRow.querySelector(".descriptionBox").value = "";
   newRow.querySelector(".price").value = "";
-  newRow.querySelector(".itemArray").value="";
-/*  newRow.querySelector(".photo").value="";
-   newRow.querySelector('.photoLabel').value="";
-  newRow.querySelector('.photoLabel').innerHTML = "Upload image"; */
+  newRow.querySelector(".itemArray").value = "";
 
   // Append the new row to the table body
   document.getElementById("TBody").appendChild(newRow);
@@ -152,7 +153,6 @@ function BtnAdd() {
   const jobSelect = newRow.querySelector(".jobSelect");
   const priceInput = newRow.querySelector(".price");
   const descriptionInput = newRow.querySelector(".descriptionBox");
-  const photoInput = newRow.querySelector('.photo');
 
   garmentSelect.addEventListener("change", function () {
     fetchJobsForGarment(garmentSelect, jobSelect);
@@ -163,33 +163,37 @@ function BtnAdd() {
     calculateTotalPrice(garmentSelect, jobSelect, newRow);
   });
 
-  priceInput.addEventListener('input', function()
-  {
+  priceInput.addEventListener('input', function () {
     overrideTotalPrice(garmentSelect, jobSelect, newRow);
   });
 
-  descriptionInput.addEventListener('input', function() {
+  descriptionInput.addEventListener('input', function () {
     overrideTotalPrice(garmentSelect, jobSelect, newRow);
   });
-
-  phoneInput.addEventListener('change', function() {
-    overrideTotalPrice(garmentSelect, jobSelect, newRow);
-  });
-
-/*   photoInput.addEventListener('change', function() {
-    overrideTotalPrice(garmentSelect, jobSelect, newRow);
-    
-    // Extract and display only the filename
-    const fullPath = photoInput.value;
-    const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
-   newRow.querySelector('.photoLabel').innerHTML = filename;
-  }); */
 
   // Show the "X" button in all rows except the first one
   const rows = document.querySelectorAll("#TBody tr");
   rows.forEach((row) => {
     row.querySelector(".btn-delete").style.display = "inline-block";
   });
+
+  // Recalculate total order price
+  calculateOrderTotal();
+}
+
+// Function to calculate the total order price
+function calculateOrderTotal() {
+  const totalPriceElement = document.querySelector('p[name="total_price"]');
+  const subtotalElement = document.querySelector('p[name="subtotal"]');
+  const salesTaxElement = document.querySelector('p[name="sales_tax"]');
+
+  const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
+  const salesTax = total * 0.0625; // Assuming a 10% sales tax
+  const subtotal = total;
+
+  subtotalElement.textContent = `Subtotal: $${subtotal.toFixed(2)}`;
+  salesTaxElement.textContent = `Sales tax: $${salesTax.toFixed(2)}`;
+  totalPriceElement.textContent = `Total price: $${(subtotal + salesTax).toFixed(2)}`;
 }
 
 // Attach the event listener to the first row when the page loads
@@ -224,11 +228,11 @@ window.addEventListener("DOMContentLoaded", function () {
   }); */
 });
 
-  // Hide the "X" button in the last row if there's only one row left
-  const rows = document.querySelectorAll("#TBody tr");
-  if (rows.length === 1) {
-    rows[0].querySelector(".btn-delete").style.display = "none";
-  }
+// Hide the "X" button in the last row if there's only one row left
+const rows = document.querySelectorAll("#TBody tr");
+if (rows.length === 1) {
+  rows[0].querySelector(".btn-delete").style.display = "none";
+}
 
 // Function to handle deleting a row
 function BtnDel(button) {
@@ -236,6 +240,8 @@ function BtnDel(button) {
   const row = button.parentNode.parentNode;
 
   // Remove the row from the table body
+  const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+  itemTotalPrices.splice(rowIndex, 1); // Remove the corresponding price from the array
   row.remove();
 
   // Hide the "X" button in the last row if there's only one row left
@@ -243,6 +249,9 @@ function BtnDel(button) {
   if (rows.length === 1) {
     rows[0].querySelector(".btn-delete").style.display = "none";
   }
+
+  // Update order total after deletion
+  calculateOrderTotal();
 }
 
 // Get the input element
@@ -354,6 +363,7 @@ function fetchJobsForGarment(selectElement, jobSelect) {
     })
 })()
 
+// Update the calculateTotalPrice function
 function calculateTotalPrice(garmentSelect, jobSelect, row) {
   const garmentId = garmentSelect.value;
   const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
@@ -361,73 +371,69 @@ function calculateTotalPrice(garmentSelect, jobSelect, row) {
   const priceInput = row.querySelector(".price");
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
-/*   const photoInput = row.querySelector('.photo').value; */
 
-  if ( !selectedJobIds.length || !garmentId )
-  {
+  if (!selectedJobIds.length || !garmentId) {
     priceInput.value = "";
     return;
   }
-  
+
   // Use AJAX to fetch the prices for the selected garment and jobs
   fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
     .then(response => response.json())
     .then(data => {
       priceInput.value = data.totalPrice;
 
-      // easy to add other fields if needed
-      const orderItem =
-      {
+      // Update the itemTotalPrices array
+      const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+      itemTotalPrices[rowIndex] = data.totalPrice;
+
+      // Create order item
+      const orderItem = {
         price: data.totalPrice,
         jobs: data.jobPairs,
         description: descriptionInput,
-/*         photo: photoInput */
       };
 
       itemInput.value = JSON.stringify(orderItem);
 
-      const subtotalElement = document.querySelector('p[name="subtotal"]');
-      const salesTaxElement = document.querySelector('p[name="sales_tax"]');
-      const totalPriceElement = document.querySelector('p[name="total_price"]');
-      
-      subtotalElement.textContent = 'Subtotal: $100.00';
-      salesTaxElement.textContent = 'Sales tax: $10.00';
-      totalPriceElement.textContent = 'Total price: $110.00';
-
+      // Update order total
+      calculateOrderTotal();
     })
     .catch(error => {
       console.error('Error calculating total price:', error);
     });
 }
 
-function overrideTotalPrice(garmentSelect, jobSelect, row)
-{
+// Update the overrideTotalPrice function
+function overrideTotalPrice(garmentSelect, jobSelect, row) {
   const garmentId = garmentSelect.value;
   const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
 
   const priceValue = row.querySelector(".price").value;
   const itemInput = row.querySelector(".itemArray");
   const descriptionInput = row.querySelector(".descriptionBox").value;
-/*   const photoInput = row.querySelector('.photo').value; */
 
- if ( !selectedJobIds.length || !garmentId )
-    return;
+  if (!selectedJobIds.length || !garmentId) return;
 
   // Use AJAX to fetch the prices for the selected garment and jobs
   fetch(`/get_job_pairs/${garmentId}/${selectedJobIds.join(",")}`)
     .then(response => response.json())
     .then(data => {
+      // Update the itemTotalPrices array
+      const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+      itemTotalPrices[rowIndex] = priceValue;
 
-      // easy to add other fields if needed
-      const orderItem =
-      {
+      // Create order item
+      const orderItem = {
         price: priceValue,
         jobs: data.jobPairs,
         description: descriptionInput,
-/*         photo: photoInput */
       };
 
       itemInput.value = JSON.stringify(orderItem);
+
+      // Update order total
+      calculateOrderTotal();
     })
     .catch(error => {
       console.error('Error retrieving job pairs:', error);

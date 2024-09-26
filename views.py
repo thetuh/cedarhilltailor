@@ -153,7 +153,7 @@ def create_order():
             flash('Invalid completion date format. Please use YYYY-MM-DD.', category='error')
             return render_template('create-order.html', garment_list=garment_list)
 
-        total_price = 0
+        subtotal = Decimal(0)  # Initialize total price
         order_items_data = []
 
         # Retrieve and parse all order items
@@ -161,8 +161,13 @@ def create_order():
         for order_item_json in order_item_json_list:
             order_item = json.loads(order_item_json)
             price = Decimal(order_item.get('price', 0))
-            total_price += price  # Safeguard against missing price
+            subtotal += price  # Add to subtotal
             order_items_data.append(order_item)
+
+        # Define sales tax rate (e.g., 6.25% tax)
+        sales_tax_rate = Decimal('0.0625')  # Adjust this as needed
+        sales_tax = subtotal * sales_tax_rate  # Calculate sales tax
+        total_price = subtotal + sales_tax  # Calculate total price including tax
 
         # Check if customer exists or create a new one
         customer = Customer.query.filter_by(phone_number=phone_number).first()
@@ -175,10 +180,10 @@ def create_order():
             # Create new order
             new_order = Order(
                 customer_id=customer.id,
-                price=total_price,
+                price=total_price,  # Use the calculated total price
                 order_date=datetime.now().date(),
-                completion_date=completion_date,  # Use the date object
-                status=OrderStatus.INCOMPLETE.value  # Convert enum to value
+                completion_date=completion_date,
+                status=OrderStatus.INCOMPLETE.value
             )
             db.session.add(new_order)
             db.session.flush()  # Flush to get order ID
@@ -187,7 +192,7 @@ def create_order():
             for order_item in order_items_data:
                 new_order_item = OrderItem(
                     order_id=new_order.id,
-                    price=Decimal(order_item.get('price', 0)),
+                    price=Decimal(order_item.get('price', 0)),  # Price for each item
                     description=order_item.get('description', '')
                 )
                 db.session.add(new_order_item)
@@ -196,7 +201,7 @@ def create_order():
                 # Add job pairs (many-to-many relationship)
                 pair_ids = order_item.get('jobs', [])
                 for pair_id in pair_ids:
-                    job_status = JobStatus.INCOMPLETE.value  # Define job_status here
+                    job_status = JobStatus.INCOMPLETE.value
                     new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id, status=job_status)
                     db.session.add(new_item_job)
 
