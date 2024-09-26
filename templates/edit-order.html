@@ -214,7 +214,7 @@ function BtnAddExisting(order_item) {
     price: order_item.price,
     jobs: order_item.pair_ids,
     description: order_item.description,
-    item_id: order_item.id
+    item_id: order_item.item_id
   };
 
   newRow.querySelector(".itemArray").value = JSON.stringify(orderItem);
