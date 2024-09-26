@@ -164,8 +164,8 @@ def create_order():
             subtotal += price  # Add to subtotal
             order_items_data.append(order_item)
 
-        # Define sales tax rate (e.g., 6.25% tax)
-        sales_tax_rate = Decimal('0.0625')  # Adjust this as needed
+        # Define sales tax rate (e.g., 8.26% tax)
+        sales_tax_rate = Decimal('0.0826')  # Adjust this as needed
         sales_tax = subtotal * sales_tax_rate  # Calculate sales tax
         total_price = subtotal + sales_tax  # Calculate total price including tax
 

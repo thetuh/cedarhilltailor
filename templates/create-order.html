@@ -188,7 +188,7 @@ function calculateOrderTotal() {
   const salesTaxElement = document.querySelector('p[name="sales_tax"]');
 
   const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
-  const salesTax = total * 0.0625; // Assuming a 10% sales tax
+  const salesTax = total * 0.0826; //
   const subtotal = total;
 
   subtotalElement.textContent = `Subtotal: $${subtotal.toFixed(2)}`;
