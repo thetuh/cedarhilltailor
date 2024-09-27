@@ -13,6 +13,9 @@
                 <h4>Dashboard</h4>
             </div>
             <div class="card-body">
+                <div>
+                    <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -20,4 +23,71 @@
 {% else %}
     <h1 align="center">Hi, guest!</h1>
 {% endif %}
+
+{% if has_role(current_user, 'admin') %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script>
+      var ctx = document.getElementById("myChart");
+
+      // Data passed from the backend
+      var labels = {{ last_7_days|safe }};
+      var orderPrices = {{ last_7_days_prices|safe }};
+
+      // Chart with proper labeling
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,  // X-axis: Last 7 days (Day names)
+          datasets: [{
+            data: orderPrices,  // Y-axis: Total prices for each day
+            lineTension: 0,  // No curve in the line
+            backgroundColor: 'transparent',  // No background fill
+            borderColor: '#007bff',  // Line color
+            borderWidth: 4,  // Line thickness
+            pointBackgroundColor: '#007bff'  // Point color on the line
+          }]
+        },
+        options: {
+          title: {
+            display: true,
+            text: 'Total revenue generated in the last 7 days',  // Chart title
+            fontSize: 18
+          },
+          scales: {
+            yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Total price (USD)'  // Y-axis label
+              },
+              ticks: {
+                beginAtZero: false  // Do not start the Y-axis from zero
+              }
+            }],
+            xAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Day of the Week'  // X-axis label
+              }
+            }]
+          },
+          legend: {
+            display: false,  // Display the legend
+            labels: {
+              boxWidth: 20,
+              padding: 15
+            }
+          },
+          tooltips: {
+            callbacks: {
+              label: function(tooltipItem, data) {
+                // Add a dollar sign to the tooltip value
+                return '$' + tooltipItem.yLabel.toFixed(2);  // Formats value as $XX.XX
+              }
+            }
+          }
+        }
+      });
+    </script>
+{% endif %}
+
 {% endblock %}

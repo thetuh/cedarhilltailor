@@ -3,11 +3,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
-from sqlalchemy import desc, not_
+from sqlalchemy import desc, not_, func
 from models import User, Role, Garment, Job, GarmentJobPair, Order, OrderItem, Customer, ItemJob, JobStatus, OrderStatus
 from application import application, db
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
+from collections import defaultdict
 import traceback
 import boto3
 import json
@@ -67,6 +68,38 @@ def process_order_item(order_item_data, order_id):
 # [ GUEST / SEAMSTRESS ROUTES ] -----------------------------------------------
 @views.route('/')
 def home():
+    if current_user.is_authenticated:
+        today = datetime.today()
+        start_date = today - timedelta(days=6)
+
+        # Query total price per day for the last 7 days
+        results = (
+            db.session.query(func.date(Order.order_date), func.sum(Order.price))
+            .filter(Order.order_date >= start_date)
+            .group_by(func.date(Order.order_date))
+            .all()
+        )
+
+        # Prepare data for the frontend
+        last_7_days = [(today - timedelta(days=i)).strftime('%A') for i in range(6, -1, -1)]
+        last_7_days_prices = {day: 0 for day in last_7_days}
+
+        for order_date_str, total_price in results:
+            # Ensure `order_date_str` is a string and convert to a datetime.date object
+            if isinstance(order_date_str, str):
+                order_date = datetime.strptime(order_date_str, '%Y-%m-%d').date()
+            else:
+                order_date = order_date_str  # Already a date object
+
+            day = order_date.strftime('%A')
+            last_7_days_prices[day] = float(total_price)
+
+        # Prepare data for the chart
+        labels = list(last_7_days_prices.keys())
+        prices = list(last_7_days_prices.values())
+
+        return render_template('home.html', last_7_days=labels, last_7_days_prices=prices)
+
     return render_template('home.html')
 
 @views.route('/search-order')
