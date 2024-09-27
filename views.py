@@ -150,7 +150,7 @@ def create_order():
         try:
             completion_date = datetime.strptime(completion_date_str, '%Y-%m-%d').date()
         except ValueError:
-            flash('Invalid completion date format. Please use YYYY-MM-DD.', category='error')
+            flash('Invalid completion date format. Please use YYYY-MM-DD', category='error')
             return render_template('create-order.html', garment_list=garment_list)
 
         subtotal = Decimal(0)  # Initialize total price
@@ -235,7 +235,7 @@ def edit_order_hard(order_id):
         try:
             completion_date = datetime.strptime(completion_date_str, '%Y-%m-%d').date()
         except ValueError:
-            flash('Invalid completion date format. Please use YYYY-MM-DD.', category='error')
+            flash('Invalid completion date format. Please use YYYY-MM-DD', category='error')
             return render_template('edit-order.html', order=order, garment_list=garment_list)
 
         # Validate inputs
@@ -269,10 +269,10 @@ def edit_order_hard(order_id):
                             except ValueError:
                                 flash(f"Invalid item ID format: {item_id}", category='error')
                     else:
-                        flash('Invalid format for deleted items. Expected a list.', category='error')
+                        flash('Invalid format for deleted items. Expected a list', category='error')
 
                 except json.JSONDecodeError:
-                    flash('Error decoding deleted items. Ensure valid JSON format.', category='error')
+                    flash('Error decoding deleted items. Ensure valid JSON format', category='error')
 
 
             # Process order items
@@ -461,6 +461,26 @@ def delete_pair(id):
     flash("Successfully deleted pair", category='success')
     return redirect(url_for('views.pairs'))
 
+@views.route('/update-status/<int:order_id>', methods=['POST'])
+@login_required
+def update_status(order_id):
+    order = Order.query.get(order_id)
+    order_complete = 1
+
+    for order_item in order.order_items:
+        for item_job in order_item.item_jobs:
+            checkbox_name = f'job_status_{item_job.item_id}_{item_job.pair_id}'
+            if request.form.get(checkbox_name):
+                item_job.status = 1
+            else:
+                item_job.status = 0
+                order_complete = 0
+
+    order.status = order_complete
+    db.session.commit()
+    flash('Job statuses updated successfully', 'success')
+    return redirect(url_for('views.search_id', order_id=order_id))
+
 @views.route('/users/delete/<int:id>')
 @login_required
 @admin_required
@@ -485,11 +505,11 @@ def create_garment():
 
         errors = []
         if not name:
-            errors.append('Please enter a valid garment name.')
+            errors.append('Please enter a valid garment name')
         
         garment = Garment.query.filter_by(name=name).first()
         if garment:
-            errors.append(f"Garment '{name}' already exists.")
+            errors.append(f"Garment '{name}' already exists")
 
         if errors:
             flash(' '.join(errors), category='error')
@@ -668,15 +688,15 @@ def create_garment_job_pair():
 
         errors = []
         if not garment_id:
-            errors.append('Please select a valid garment.')
+            errors.append('Please select a valid garment')
         if not job_id:
-            errors.append('Please select a valid job.')
+            errors.append('Please select a valid job')
         if not price or Decimal(price) <= 0:
-            errors.append('Please enter a valid price.')
+            errors.append('Please enter a valid price')
 
         # Check for existing garment-job pair
         if GarmentJobPair.query.filter_by(garment_id=garment_id, job_id=job_id).first():
-            errors.append('This garment-job pair already exists.')
+            errors.append('This garment-job pair already exists')
 
         if errors:
             flash(' '.join(errors), category='error')
@@ -686,7 +706,7 @@ def create_garment_job_pair():
             new_pair = GarmentJobPair(garment_id=garment_id, job_id=job_id, price=Decimal(price))
             db.session.add(new_pair)
             db.session.commit()
-            flash(f'Successfully created garment-job pair.', category='success')
+            flash(f'Successfully created garment-job pair', category='success')
         except Exception as e:
             db.session.rollback()
             flash(f'An error occurred: {str(e)}', category='error')
