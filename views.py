@@ -426,7 +426,7 @@ def manage_users():
 
 @views.route('/inventory/garments/delete/<int:id>')
 @login_required
-@admin_required
+@manager_required
 def delete_garment(id):
     garment = Garment.query.get(id)
     if not garment:
@@ -441,7 +441,7 @@ def delete_garment(id):
 
 @views.route('/inventory/jobs/delete/<int:id>')
 @login_required
-@admin_required
+@manager_required
 def delete_job(id):
     job = Job.query.get(id)
     if not job:
@@ -456,7 +456,7 @@ def delete_job(id):
 
 @views.route('/inventory/pairs/delete/<int:id>')
 @login_required
-@admin_required
+@manager_required
 def delete_pair(id):
     pair = GarmentJobPair.query.get(id)
     if not pair:
@@ -506,7 +506,7 @@ def delete_user(id):
 
 @views.route('/inventory/garments/create', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@manager_required
 def create_garment():
     if request.method == 'POST':
         name = request.form.get('name').strip()
@@ -534,7 +534,7 @@ def create_garment():
 
 @views.route('/inventory/jobs/create', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@manager_required
 def create_job():
     if request.method == 'POST':
         name = request.form.get('name').strip()
@@ -603,7 +603,7 @@ def create_user():
 
 @views.route('/inventory/garments/edit', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@manager_required
 def edit_garment():
     if request.method == 'POST':
         garment_id = request.form.get('id')
@@ -631,7 +631,7 @@ def edit_garment():
 
 @views.route('/inventory/jobs/edit', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@manager_required
 def edit_job():
     if request.method == 'POST':
         job_id = request.form.get('id')
@@ -659,7 +659,7 @@ def edit_job():
 
 @views.route('/inventory/pairs/edit', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@manager_required
 def edit_pair():
     if request.method == 'POST':
         pair_id = request.form.get('id')
@@ -687,7 +687,7 @@ def edit_pair():
 
 @views.route('/inventory/pairs/create', methods=['GET', 'POST'])
 @login_required
-@admin_required
+@manager_required
 def create_garment_job_pair():
     if request.method == 'POST':
         garment_id = request.form.get('garment_id')

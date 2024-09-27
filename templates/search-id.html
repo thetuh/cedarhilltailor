@@ -13,7 +13,9 @@
             <th>Order date</th>
             <th>Completion date</th>
             <th>Status</th>
+            {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') or has_role(current_user, 'seamstress') %}
             <th>Actions</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -29,11 +31,17 @@
                         Complete
                     {% endif %}
                 </td>
+                {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
                 <td>
                     <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{order.id}}">Overview</button>
                     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalupdate{{order.id}}">Update status</button>
                     <a href="/edit-order/{{ order.id }}" class="btn btn-sm btn-warning">Modify details</a>
                 </td>
+                {% elif has_role(current_user, 'seamstress') %}
+                <td>
+                    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalupdate{{order.id}}">Update status</button>
+                </td>
+                {% endif %}         
             </tr>
         {% endfor %}
     </tbody>
