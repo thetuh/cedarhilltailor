@@ -38,22 +38,27 @@ def process_order_item(order_item_data, order_id):
         order_item = OrderItem.query.get_or_404(item_id)
         order_item.price = price
         order_item.description = description
+
+        # Update job pairs if needed
+        pair_ids = order_item_data.get('jobs', [])
+        existing_job_pairs = {job.pair_id for job in ItemJob.query.filter_by(item_id=order_item.id).all()}
+
+        for pair_id in pair_ids:
+            if pair_id not in existing_job_pairs:
+                job_status = JobStatus.INCOMPLETE.value  # Convert enum to its integer value
+                new_item_job = ItemJob(item_id=order_item.id, pair_id=pair_id, status=job_status)
+                db.session.add(new_item_job)
+
     else:  # New order item
         new_order_item = OrderItem(order_id=order_id, price=price, description=description)
         db.session.add(new_order_item)
         db.session.flush()  # Flush to get new_order_item.id
 
-        order_item = new_order_item  # Assign new_order_item to order_item for job pairs processing
-
-    # Handle job pairs if needed
-    pair_ids = order_item_data.get('jobs', [])
-    for pair_id in pair_ids:
-        # Check if this pair already exists
-        existing_item_job = ItemJob.query.filter_by(item_id=order_item.id, pair_id=pair_id).first()
-
-        if not existing_item_job:
-            job_status = JobStatus.INCOMPLETE.value  # Convert enum to its integer value
-            new_item_job = ItemJob(item_id=order_item.id, pair_id=pair_id, status=job_status)  # use order_item.id
+        # Handle job pairs for the new order item
+        pair_ids = order_item_data.get('jobs', [])
+        for pair_id in pair_ids:
+            job_status = JobStatus.INCOMPLETE.value
+            new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id, status=job_status)
             db.session.add(new_item_job)
 
 # [ GUEST / SEAMSTRESS ROUTES ] -----------------------------------------------
@@ -248,10 +253,9 @@ def edit_order_hard(order_id):
         order_item_json_list = request.form.getlist('item[]')
 
         try:
-            # Remove existing item jobs before updating
+            # Get existing order items
             existing_order_items = OrderItem.query.filter(OrderItem.order_id == order.id).all()
             existing_item_job_ids = [item.id for item in existing_order_items]
-            ItemJob.query.filter(ItemJob.item_id.in_(existing_item_job_ids)).delete()
 
             deleted_item_json_list = request.form.getlist('deleted[]')
             for deleted_item_json in deleted_item_json_list:
@@ -266,6 +270,7 @@ def edit_order_hard(order_id):
                                 order_item = OrderItem.query.get(Decimal(item_id))
                                 if order_item:
                                     db.session.delete(order_item)
+                                    ItemJob.query.filter(ItemJob.item_id == order_item.id).delete()
                             except ValueError:
                                 flash(f"Invalid item ID format: {item_id}", category='error')
                     else:
