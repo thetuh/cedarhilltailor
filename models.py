@@ -26,8 +26,8 @@ class GarmentJobPair(db.Model):
     garment = db.relationship('Garment', backref='garment_job_pairs')
     job = db.relationship('Job', backref='garment_job_pairs')
 
-    # Ensure the backref name is unique to avoid conflicts
-    item_jobs = db.relationship('ItemJob', backref='garment_job_pair_ref', lazy='joined', cascade='all, delete-orphan')
+    # Use back_populates instead of backref to avoid conflicts
+    item_jobs = db.relationship('ItemJob', back_populates='pair', lazy='joined', cascade='all, delete-orphan')
 
 class ItemJob(db.Model):
     __tablename__ = 'item_job'
@@ -37,10 +37,10 @@ class ItemJob(db.Model):
 
     status = db.Column(db.SmallInteger, nullable=False, default=JobStatus.INCOMPLETE)
 
-    # Ensure that this backref name is unique
-    pair = db.relationship('GarmentJobPair', backref='item_jobs_ref', lazy='joined')
+    # Explicitly link both sides with back_populates
+    pair = db.relationship('GarmentJobPair', back_populates='item_jobs', lazy='joined')
 
-# Junction table used to store the association of a order and its items (image, description, price)
+# Junction table used to store the association of an order and its items (image, description, price)
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
