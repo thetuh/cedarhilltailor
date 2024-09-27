@@ -6,8 +6,8 @@
 <h1 align="center">Phone number: {{ phone_number }}</h1>
 <br>
 
-<table class="table table-striped table-bordered table-sm">
-    <thead>
+<table class="table table-sm table-bordered">
+    <thead class="thead-light">
         <tr>
             <th>Order ID</th>
             <th>Order date</th>
@@ -56,8 +56,8 @@
                         <label>Price: ${{ order_item.price }}</label> <br>
                         <label>Description:</label>
                         <textarea readonly class="form-control">{{ order_item.description }}</textarea><br>
-                        <table class="table table-striped table-bordered table-sm">
-                            <thead>
+                        <table class="table table-sm table-bordered">
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Job</th>
                                     <th>Status</th>
