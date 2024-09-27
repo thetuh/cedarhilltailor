@@ -19,21 +19,26 @@ class GarmentJobPair(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), index=True)
     price = db.Column(db.DECIMAL(10, 2), nullable=False)
 
-    # Define a unique constraint on garment_id and job_id
+    # Unique constraint on garment_id and job_id
     db.UniqueConstraint('garment_id', 'job_id', name='uq_garment_job_pair')
 
     # Relationships
     garment = db.relationship('Garment', backref='garment_job_pairs')
     job = db.relationship('Job', backref='garment_job_pairs')
 
-# Junction table used to store the association of job pair and item id
+    # Ensure the backref name is unique to avoid conflicts
+    item_jobs = db.relationship('ItemJob', backref='garment_job_pair_ref', lazy='joined', cascade='all, delete-orphan')
+
 class ItemJob(db.Model):
+    __tablename__ = 'item_job'
+
     item_id = db.Column(db.Integer, db.ForeignKey('order_item.id'), primary_key=True)
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
 
     status = db.Column(db.SmallInteger, nullable=False, default=JobStatus.INCOMPLETE)
 
-    pair = db.relationship('GarmentJobPair', backref='item_job', lazy='joined')
+    # Ensure that this backref name is unique
+    pair = db.relationship('GarmentJobPair', backref='item_jobs_ref', lazy='joined')
 
 # Junction table used to store the association of a order and its items (image, description, price)
 class OrderItem(db.Model):

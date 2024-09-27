@@ -437,7 +437,7 @@ def delete_garment(id):
 def delete_job(id):
     job = Job.query.get(id)
     if not job:
-        flash('job not found', category='error')
+        flash('Job not found', category='error')
         return redirect(url_for('views.jobs'))
 
     db.session.delete(job)
@@ -445,6 +445,21 @@ def delete_job(id):
 
     flash(f"Successfully deleted' '{job.name}'", category='success')
     return redirect(url_for('views.jobs'))
+
+@views.route('/inventory/pairs/delete/<int:id>')
+@login_required
+@admin_required
+def delete_pair(id):
+    pair = GarmentJobPair.query.get(id)
+    if not pair:
+        flash('Pair not found', category='error')
+        return redirect(url_for('views.pairs'))
+
+    db.session.delete(pair)  # This will also delete related ItemJob instances
+    db.session.commit()
+
+    flash("Successfully deleted pair", category='success')
+    return redirect(url_for('views.pairs'))
 
 @views.route('/users/delete/<int:id>')
 @login_required
@@ -613,6 +628,34 @@ def edit_job():
         return redirect(url_for('views.jobs'))
 
     return render_template('jobs.html')
+
+@views.route('/inventory/pairs/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_pair():
+    if request.method == 'POST':
+        pair_id = request.form.get('id')
+        price = request.form.get('price')
+
+        # Retrieve pair
+        pair = GarmentJobPair.query.get(pair_id)
+        if not pair:
+            flash('pair not found', category='error')
+            return redirect(url_for('views.pairs'))
+
+        # Validation
+        if not price:
+            flash('Please enter a valid price', category='error')
+            return redirect(url_for('views.pairs'))
+
+        # Update pair
+        pair.price = price
+        db.session.commit()
+
+        flash(f"Successfully updated pair", category='success')
+        return redirect(url_for('views.pairs'))
+
+    return render_template('pairs.html')
 
 @views.route('/inventory/pairs/create', methods=['GET', 'POST'])
 @login_required

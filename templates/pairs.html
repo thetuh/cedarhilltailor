@@ -24,11 +24,12 @@
 
 <!-- Table for displaying garment-job pairs -->
 {% if garment_job_pairs %}
-    <table class="table table-bordered mt-4 text-center">
-        <thead>
+    <table class="table table-sm table-bordered">
+        <thead class="thead-light">
             <tr>
                 <th>Job</th>
                 <th>Price</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -36,7 +37,38 @@
                 <tr>
                     <td>{{ pair.job.name }}</td>
                     <td>${{ pair.price }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{ pair.id }}" data-price="{{ pair.price }}">Edit price</button>
+                        <a href="/inventory/pairs/delete/{{ pair.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete `{{ pair.job.name }}`?')">Delete</a>
+                    </td>
                 </tr>
+
+                <!-- Modal for editing price -->
+                <div class="modal fade" id="modaledit{{ pair.id }}" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit '{{ pair.job.name }}'</h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('views.edit_pair') }}" method="POST">
+                                    <div class="form-group">
+                                        <label for="price">Price</label>
+                                        <input type="hidden" name="id" value="{{pair.id}}">
+                                        <input type="number" class="form-control" name="price" step="0.01" value="{{ pair.price }}" required>
+                                    </div>
+                                    <div id="wrapper">
+                                        <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
+                                        <button style='margin-right:16px' type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
         </tbody>
     </table>
