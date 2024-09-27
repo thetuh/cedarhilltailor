@@ -33,6 +33,7 @@ def process_order_item(order_item_data, order_id):
     item_id = order_item_data.get('item_id')
     price = Decimal(order_item_data.get('price', 0))
     description = order_item_data.get('description', '')
+    order = Order.query.get_or_404(order_id)
 
     if item_id and Decimal(item_id) != -1:  # Existing order item
         order_item = OrderItem.query.get_or_404(item_id)
@@ -46,6 +47,7 @@ def process_order_item(order_item_data, order_id):
         for pair_id in pair_ids:
             if pair_id not in existing_job_pairs:
                 job_status = JobStatus.INCOMPLETE.value  # Convert enum to its integer value
+                order.status = OrderStatus.INCOMPLETE.value
                 new_item_job = ItemJob(item_id=order_item.id, pair_id=pair_id, status=job_status)
                 db.session.add(new_item_job)
 
@@ -58,6 +60,7 @@ def process_order_item(order_item_data, order_id):
         pair_ids = order_item_data.get('jobs', [])
         for pair_id in pair_ids:
             job_status = JobStatus.INCOMPLETE.value
+            order.status = OrderStatus.INCOMPLETE.value
             new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id, status=job_status)
             db.session.add(new_item_job)
 
