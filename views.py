@@ -80,7 +80,25 @@ def home():
             .all()
         )
 
-        # Prepare data for the frontend
+        # Query to calculate total revenue by garment type
+        revenue_by_garment = (
+            db.session.query(
+                Garment.name,
+                func.sum(OrderItem.price).label('total_revenue')
+            )
+            .join(ItemJob, OrderItem.id == ItemJob.item_id)  # Join ItemJob to OrderItem
+            .join(GarmentJobPair, ItemJob.pair_id == GarmentJobPair.id)  # Join GarmentJobPair to ItemJob
+            .join(Garment, GarmentJobPair.garment_id == Garment.id)  # Join Garment to GarmentJobPair
+            .group_by(Garment.name)
+            .order_by(func.sum(OrderItem.price).desc())
+            .all()
+        )
+
+        # Prepare labels (garment names) and data (total revenue)
+        revenue_by_garment_labels = [row[0] for row in revenue_by_garment]  # Garment names
+        revenue_by_garment_data = [float(row[1]) for row in revenue_by_garment]  # Total revenue
+
+        # Prepare data for the last 7 days
         last_7_days = [(today - timedelta(days=i)).strftime('%A') for i in range(6, -1, -1)]
         last_7_days_prices = {day: 0 for day in last_7_days}
 
@@ -98,7 +116,13 @@ def home():
         labels = list(last_7_days_prices.keys())
         prices = list(last_7_days_prices.values())
 
-        return render_template('home.html', last_7_days=labels, last_7_days_prices=prices)
+        return render_template(
+            'home.html', 
+            last_7_days=labels, 
+            last_7_days_prices=prices, 
+            revenue_by_garment_labels=revenue_by_garment_labels, 
+            revenue_by_garment_data=revenue_by_garment_data
+        )
 
     return render_template('home.html')
 
