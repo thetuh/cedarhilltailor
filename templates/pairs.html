@@ -11,69 +11,75 @@
     <form method="POST" class="mb-3">
         <select class="custom-select custom-select-sm garmentSelect" required name="garment_id" id="garmentSelect">
             {% for garment in garment_list %}
-              <option value="{{ garment.id }}" {% if garment.id|string == garment_id %}selected{% endif %}>{{ garment.name }}</option>
+            <option value="{{ garment.id }}" {% if garment.id|string==garment_id %}selected{% endif %}>{{ garment.name
+                }}</option>
             {% endfor %}
         </select>
 
         <div id="wrapper" class="mt-3">
             <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Display</button>
-            <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#modalcreate">Create</button>
+            <button class="btn btn-success" type="button" data-bs-toggle="modal"
+                data-bs-target="#modalcreate">Create</button>
         </div>
     </form>
 </div>
 
 <!-- Table for displaying garment-job pairs -->
 {% if garment_job_pairs %}
-    <table class="table table-sm table-bordered">
-        <thead class="thead-light">
-            <tr>
-                <th>Job</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pair in garment_job_pairs %}
-                <tr>
-                    <td>{{ pair.job.name }}</td>
-                    <td>${{ pair.price }}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{ pair.id }}" data-price="{{ pair.price }}">Edit price</button>
-                        <a href="/inventory/pairs/delete/{{ pair.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete `{{ pair.job.name }}`?')">Delete</a>
-                    </td>
-                </tr>
+<table class="table table-sm table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th>Job</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pair in garment_job_pairs %}
+        <tr>
+            <td>{{ pair.job.name }}</td>
+            <td>${{ pair.price }}</td>
+            <td>
+                <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal"
+                    data-bs-target="#modaledit{{ pair.id }}" data-price="{{ pair.price }}">Edit price</button>
+                <a href="/inventory/pairs/delete/{{ pair.id }}" class="btn btn-sm btn-danger"
+                    onclick="return confirm('Are you sure you want to delete `{{ pair.job.name }}`?')">Delete</a>
+            </td>
+        </tr>
 
-                <!-- Modal for editing price -->
-                <div class="modal fade" id="modaledit{{ pair.id }}" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Edit '{{ pair.job.name }}'</h5>
-                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+        <!-- Modal for editing price -->
+        <div class="modal fade" id="modaledit{{ pair.id }}" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit '{{ pair.job.name }}'</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url_for('views.edit_pair') }}" method="POST">
+                            <div class="form-group">
+                                <label for="price">Price</label>
+                                <input type="hidden" name="id" value="{{pair.id}}">
+                                <input type="number" class="form-control" name="price" step="0.01"
+                                    value="{{ pair.price }}" required>
                             </div>
-                            <div class="modal-body">
-                                <form action="{{ url_for('views.edit_pair') }}" method="POST">
-                                    <div class="form-group">
-                                        <label for="price">Price</label>
-                                        <input type="hidden" name="id" value="{{pair.id}}">
-                                        <input type="number" class="form-control" name="price" step="0.01" value="{{ pair.price }}" required>
-                                    </div>
-                                    <div id="wrapper">
-                                        <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
-                                        <button style='margin-right:16px' type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    </div>
-                                </form>
+                            <div id="wrapper">
+                                <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
+                                <button style='margin-right:16px' type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Close</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
-            {% endfor %}
-        </tbody>
-    </table>
+            </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
 {% elif garment_id %}
-    <p class="text-center mt-4">No pairs found for the selected garment.</p>
+<p class="text-center mt-4">No pairs found for the selected garment.</p>
 {% endif %}
 
 <div id="modalcreate" class="modal fade" role="dialog">
@@ -88,7 +94,7 @@
                         <label for="job_id">Job</label>
                         <select class="custom-select" name="job_id" required>
                             {% for job in job_list %}
-                              <option value="{{ job.id }}">{{ job.name }}</option>
+                            <option value="{{ job.id }}">{{ job.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -99,9 +105,10 @@
                     <input type="hidden" name="garment_id" id="hiddenGarmentId">
                     <div id="wrapper">
                         <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
-                        <button style='margin-right:16px' type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>     
-                </form>                                                                  
+                        <button style='margin-right:16px' type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -111,8 +118,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#modalcreate').on('show.bs.modal', function() {
+    $(document).ready(function () {
+        $('#modalcreate').on('show.bs.modal', function () {
             var selectedGarmentId = $('#garmentSelect').val();
             $('#hiddenGarmentId').val(selectedGarmentId);
         });

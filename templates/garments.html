@@ -15,38 +15,41 @@
     </thead>
     <tbody>
         {% for garment in garments_pagination.items %}
-            <tr>
-                <td width="50%">{{ garment.name }}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal" data-bs-target="#modaledit{{garment.id}}">Edit name</button>
-                    <a href="/inventory/garments/delete/{{ garment.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete `{{ garment.name }}`?')">Delete</a>
-                </td>
-            </tr>
+        <tr>
+            <td width="50%">{{ garment.name }}</td>
+            <td>
+                <button class="btn btn-sm btn-warning" type="button" data-bs-toggle="modal"
+                    data-bs-target="#modaledit{{garment.id}}">Edit name</button>
+                <a href="/inventory/garments/delete/{{ garment.id }}" class="btn btn-sm btn-danger"
+                    onclick="return confirm('Are you sure you want to delete `{{ garment.name }}`?')">Delete</a>
+            </td>
+        </tr>
 
-            <!-- Edit Modal -->
-            <div id="modaledit{{garment.id}}" class="modal fade" role="dialog" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Edit '{{garment.name}}'</h4>
-                            <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="{{url_for('views.edit_garment')}}" method="POST">
-                                <div class="form-group">
-                                    <label>Name:</label>
-                                    <input type="hidden" name="id" value="{{garment.id}}">
-                                    <input type="text" class="form-control" name="name" value="{{garment.name}}">
-                                </div>
-                                <div id="wrapper">
-                                    <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
-                                    <button style='margin-right:16px' type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </form>
-                        </div>
+        <!-- Edit Modal -->
+        <div id="modaledit{{garment.id}}" class="modal fade" role="dialog" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Edit '{{garment.name}}'</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{url_for('views.edit_garment')}}" method="POST">
+                            <div class="form-group">
+                                <label>Name:</label>
+                                <input type="hidden" name="id" value="{{garment.id}}">
+                                <input type="text" class="form-control" name="name" value="{{garment.name}}">
+                            </div>
+                            <div id="wrapper">
+                                <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
+                                <button style='margin-right:16px' type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
         {% endfor %}
     </tbody>
 </table>
@@ -70,9 +73,10 @@
                     </div>
                     <div id="wrapper">
                         <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
-                        <button style='margin-right:16px' type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>     
-                </form>                                                                  
+                        <button style='margin-right:16px' type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

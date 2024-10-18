@@ -36,9 +36,16 @@ class ItemJob(db.Model):
     pair_id = db.Column(db.Integer, db.ForeignKey('garment_job_pair.id'), primary_key=True)
 
     status = db.Column(db.SmallInteger, nullable=False, default=JobStatus.INCOMPLETE)
+    
+    # New fields for tracking job completion
+    completed_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    completion_time = db.Column(db.DateTime, nullable=True)
 
     # Explicitly link both sides with back_populates
     pair = db.relationship('GarmentJobPair', back_populates='item_jobs', lazy='joined')
+
+    # Relationship to track the user who completed the job
+    completed_by = db.relationship('User', backref='completed_jobs', lazy='joined')
 
 # Junction table used to store the association of an order and its items (image, description, price)
 class OrderItem(db.Model):

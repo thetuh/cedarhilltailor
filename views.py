@@ -535,14 +535,23 @@ def update_status(order_id):
     for order_item in order.order_items:
         for item_job in order_item.item_jobs:
             checkbox_name = f'job_status_{item_job.item_id}_{item_job.pair_id}'
-            if request.form.get(checkbox_name):
+            
+            if request.form.get(checkbox_name):  # If the job is marked as complete
                 item_job.status = 1
+                
+                # If the job was incomplete before, record completion details
+                if item_job.completed_by_id is None:
+                    item_job.completed_by_id = current_user.id  # Track the user who completed it
+                    item_job.completion_time = datetime.utcnow()  # Set completion time
             else:
                 item_job.status = 0
-                order_complete = 0
+                item_job.completed_by_id = None
+                item_job.completion_time = None
+                order_complete = 0  # If any item is incomplete, the entire order is incomplete
 
     order.status = order_complete
     db.session.commit()
+    
     flash('Job statuses updated successfully', 'success')
     return redirect(url_for('views.search_id', order_id=order_id))
 

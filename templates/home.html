@@ -4,132 +4,132 @@
 {% block content %}
 <br>
 {% if current_user.is_authenticated %}
-    <h1 align="center">Hi, {{ current_user.username }}!</h1>
-    <br>
-    {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <h4>Dashboard</h4>
-            </div>
-            <div class="card-body">
-                <div>
-                    <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
-                    <canvas id="revenueChart" width="900" height="380"></canvas>
-                </div>
-            </div>
-        </div>
+<h1 align="center">Hi, {{ current_user.username }}!</h1>
+<br>
+{% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4>Dashboard</h4>
     </div>
-    {% endif %}
+    <div class="card-body">
+      <div>
+        <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
+        <canvas id="revenueChart" width="900" height="380"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% else %}
-    <h1 align="center">Hi, guest!</h1>
+<h1 align="center">Hi, guest!</h1>
 {% endif %}
 
 {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-    <script>
-      var ctx = document.getElementById("myChart");
+<script>
+  var ctx = document.getElementById("myChart");
 
-      // Data passed from the backend
-      var labels = {{ last_7_days|safe }};
-      var orderPrices = {{ last_7_days_prices|safe }};
+  // Data passed from the backend
+  var labels = {{ last_7_days| safe }};
+  var orderPrices = {{ last_7_days_prices| safe }};
 
-      // Chart with proper labeling
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,  // X-axis: Last 7 days (Day names)
-          datasets: [{
-            data: orderPrices,  // Y-axis: Total prices for each day
-            lineTension: 0,  // No curve in the line
-            backgroundColor: 'transparent',  // No background fill
-            borderColor: '#007bff',  // Line color
-            borderWidth: 4,  // Line thickness
-            pointBackgroundColor: '#007bff'  // Point color on the line
-          }]
-        },
-        options: {
-          title: {
+  // Chart with proper labeling
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,  // X-axis: Last 7 days (Day names)
+      datasets: [{
+        data: orderPrices,  // Y-axis: Total prices for each day
+        lineTension: 0,  // No curve in the line
+        backgroundColor: 'transparent',  // No background fill
+        borderColor: '#007bff',  // Line color
+        borderWidth: 4,  // Line thickness
+        pointBackgroundColor: '#007bff'  // Point color on the line
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Total revenue generated in the last 7 days',  // Chart title
+        fontSize: 18
+      },
+      scales: {
+        yAxes: [{
+          scaleLabel: {
             display: true,
-            text: 'Total revenue generated in the last 7 days',  // Chart title
-            fontSize: 18
+            labelString: 'US Dollars'  // Y-axis label
           },
-          scales: {
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'US Dollars'  // Y-axis label
-              },
-              ticks: {
-                beginAtZero: false  // Do not start the Y-axis from zero
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Day of the Week'  // X-axis label
-              }
-            }]
-          },
-          legend: {
-            display: false,  // Display the legend
-            labels: {
-              boxWidth: 20,
-              padding: 15
-            }
-          },
-          tooltips: {
-            callbacks: {
-              label: function(tooltipItem, data) {
-                // Add a dollar sign to the tooltip value
-                return '$' + tooltipItem.yLabel.toFixed(2);  // Formats value as $XX.XX
-              }
-            }
+          ticks: {
+            beginAtZero: false  // Do not start the Y-axis from zero
+          }
+        }],
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Day of the Week'  // X-axis label
+          }
+        }]
+      },
+      legend: {
+        display: false,  // Display the legend
+        labels: {
+          boxWidth: 20,
+          padding: 15
+        }
+      },
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            // Add a dollar sign to the tooltip value
+            return '$' + tooltipItem.yLabel.toFixed(2);  // Formats value as $XX.XX
           }
         }
-      });
-    </script>
+      }
+    }
+  });
+</script>
 
 <script>
-    var ctx = document.getElementById("revenueChart").getContext('2d');
+  var ctx = document.getElementById("revenueChart").getContext('2d');
 
-    var myBarChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ revenue_by_garment_labels|safe }},  // Garment names
-            datasets: [{
-                label: 'US Dollars',
-                data: {{ revenue_by_garment_data|safe }},  // Revenue values
-                backgroundColor: '#007bff'
+  var myBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ revenue_by_garment_labels| safe }},  // Garment names
+  datasets: [{
+    label: 'US Dollars',
+    data: {{ revenue_by_garment_data| safe }},  // Revenue values
+    backgroundColor: '#007bff'
             }]
         },
-        options: {
-            title: {
-                display: true,
-                text: 'Most revenue by garment type (all time)',
-                fontSize: 18
-            },
-            legend: {
-                display: false  // Disable the legend
-            },
-            scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'US Dollars'  // Correct label for Y-axis
-                    },
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }],
-                xAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Garment Type'  // Correct label for X-axis
-                    }
-                }]
-            }
+  options: {
+    title: {
+      display: true,
+        text: 'Most revenue by garment type (all time)',
+          fontSize: 18
+    },
+    legend: {
+      display: false  // Disable the legend
+    },
+    scales: {
+      yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: 'US Dollars'  // Correct label for Y-axis
+        },
+        ticks: {
+          beginAtZero: true
         }
+      }],
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Garment Type'  // Correct label for X-axis
+          }
+        }]
+    }
+  }
     });
 </script>
 

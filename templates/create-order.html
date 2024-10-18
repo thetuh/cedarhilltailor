@@ -7,52 +7,55 @@
 <br>
 
 <form id="myForm" class="needs-validation" novalidate method="POST">
-<div class="container">
+  <div class="container">
     <div class="card">
-        <div class="card-header">
-            <h4>Contact information</h4>
-        </div>
-        <div class="card-body">
-            <div class="form-row">
-                <div class="col">
-                    <div class="input-group has-validation input-group-sm mb-3">
-                        <div class="input-group-prepend" >
-                          <span class="input-group-text" id="basic-addon1">First name</span>
-                        </div>
-                        <input type="text" class="form-control" id="first-name" name="first-name" required pattern="[A-Za-z]{1,32}" aria-label="FirstName" placeholder="e.g. John" aria-describedby="basic-addon1">
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-              <div class="col">
-                <div class="input-group input-group-sm mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="basic-addon1">Last name</span>
-                    </div>
-                    <input type="text" class="form-control" id="last-name" name="last-name" required pattern="[A-Za-z]{1,32}" aria-label="LastName" placeholder="e.g. Smith" aria-describedby="basic-addon1">
-                </div>
-            </div>
-            </div>
-            <div class="form-row">
-              <div class="col">
-                <div class="input-group input-group-sm">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Phone number</span>
-                  </div>
-                  <input type="tel" id="phone" class="form-control" required name="phone-number" placeholder="e.g. 888-888-8888" aria-label="PhoneNumber" aria-describedby="basic-addon1">
-                </div>
-            </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<br>
-
-<div class="container">
-  <div class="card">
       <div class="card-header">
-          <h4>Invoice</h4>
+        <h4>Contact information</h4>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="col">
+            <div class="input-group has-validation input-group-sm mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">First name</span>
+              </div>
+              <input type="text" class="form-control" id="first-name" name="first-name" required
+                pattern="[A-Za-z]{1,32}" aria-label="FirstName" placeholder="e.g. John" aria-describedby="basic-addon1">
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col">
+            <div class="input-group input-group-sm mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Last name</span>
+              </div>
+              <input type="text" class="form-control" id="last-name" name="last-name" required pattern="[A-Za-z]{1,32}"
+                aria-label="LastName" placeholder="e.g. Smith" aria-describedby="basic-addon1">
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Phone number</span>
+              </div>
+              <input type="tel" id="phone" class="form-control" required name="phone-number"
+                placeholder="e.g. 888-888-8888" aria-label="PhoneNumber" aria-describedby="basic-addon1">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h4>Invoice</h4>
       </div>
       <div class="card-body">
         <table class="table table-sm table-bordered">
@@ -70,7 +73,7 @@
                 <select class="custom-select custom-select-sm garmentSelect" required name="garment[]">
                   <option selected disabled></option>
                   {% for garment in garment_list %}
-                    <option value="{{ garment.id }}">{{ garment.name }}</option>
+                  <option value="{{ garment.id }}">{{ garment.name }}</option>
                   {% endfor %}
                 </select>
                 <label class="small-label" for="basic-url">Jobs</label>
@@ -82,46 +85,50 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">$</span>
                   </div>
-                  <input type="text" class="form-control price" id="price" name="price[]" required pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
-                </div>            
+                  <input type="text" class="form-control price" id="price" name="price[]" required
+                    pattern="\d+(\.\d{1,2})?" aria-label="Price" aria-describedby="basic-addon1">
+                </div>
               </td>
               <td style="width: 25%; position: relative;">
-<!--                 <div class="custom-file">
+                <!--                 <div class="custom-file">
                   <input class="custom-file-input photo" id="inputGroupFile01">
                   <label class="custom-file-label photoLabel" for="inputGroupFile01">Upload image</label>
                 </div>
                 <br>
                 <br> -->
-                <textarea name="description" style="position: absolute; height: 72%; width: 94%;" class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
+                <textarea name="description" style="position: absolute; height: 72%; width: 94%;"
+                  class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
               </td>
-              <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete" onclick="BtnDel(this)">X</button></td>
+              <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete"
+                  onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
             </tr>
           </tbody>
         </table>
         <div id="wrapper">
-        <button type="button" class="btn btn-sm btn-success" onclick="BtnAdd()">+</button>
+          <button type="button" class="btn btn-sm btn-success" onclick="BtnAdd()">+</button>
         </div>
         <br>
         <label for="basic-url">Completion date</label>
         <div class="md-form md-outline input-with-post-icon datepicker">
-          <input placeholder="Select date" name="date" type="date" id="example" class="form-control form-control-sm" required>
+          <input placeholder="Select date" name="date" type="date" id="example" class="form-control form-control-sm"
+            required>
         </div>
         <br>
         <div id="price" class="text-md-right">
           <p name="subtotal" class="font-weight-normal">Subtotal: </p>
           <p name="sales_tax" class="font-weight-normal">Sales tax: </p>
           <p name="total_price" class="font-weight-bold">Total price: </p>
+        </div>
       </div>
-      </div>
+    </div>
   </div>
-</div>
 
-<br>
+  <br>
 
-<div id="wrapper">
-  <button type="submit" class="btn btn-primary">Create</button>
-</div>
+  <div id="wrapper">
+    <button type="submit" class="btn btn-primary">Create</button>
+  </div>
 
 </form>
 
@@ -130,119 +137,103 @@
 
 <script>
 
-// Initialize an array to hold the total prices of each item
-let itemTotalPrices = [];
+  // Initialize an array to hold the total prices of each item
+  let itemTotalPrices = [];
 
-// Function to add a new row
-function BtnAdd() {
-  // Clone the first row
-  const newRow = document.getElementById("TRow").cloneNode(true);
-  
-  // Clear the selection in the cloned row
-  newRow.querySelector(".garmentSelect").selectedIndex = 0;
-  newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
-  newRow.querySelector(".descriptionBox").value = "";
-  newRow.querySelector(".price").value = "";
-  newRow.querySelector(".itemArray").value = "";
+  // Function to add a new row
+  function BtnAdd() {
+    // Clone the first row
+    const newRow = document.getElementById("TRow").cloneNode(true);
 
-  // Append the new row to the table body
-  document.getElementById("TBody").appendChild(newRow);
+    // Clear the selection in the cloned row
+    newRow.querySelector(".garmentSelect").selectedIndex = 0;
+    newRow.querySelector(".jobSelect").innerHTML = "<option selected disabled></option>"; // Clear job options
+    newRow.querySelector(".descriptionBox").value = "";
+    newRow.querySelector(".price").value = "";
+    newRow.querySelector(".itemArray").value = "";
 
-  // Get the corresponding garmentSelect and jobSelect elements in the cloned row
-  const garmentSelect = newRow.querySelector(".garmentSelect");
-  const jobSelect = newRow.querySelector(".jobSelect");
-  const priceInput = newRow.querySelector(".price");
-  const descriptionInput = newRow.querySelector(".descriptionBox");
+    // Append the new row to the table body
+    document.getElementById("TBody").appendChild(newRow);
 
-  garmentSelect.addEventListener("change", function () {
-    fetchJobsForGarment(garmentSelect, jobSelect);
-    priceInput.value = "";
+    // Get the corresponding garmentSelect and jobSelect elements in the cloned row
+    const garmentSelect = newRow.querySelector(".garmentSelect");
+    const jobSelect = newRow.querySelector(".jobSelect");
+    const priceInput = newRow.querySelector(".price");
+    const descriptionInput = newRow.querySelector(".descriptionBox");
+
+    garmentSelect.addEventListener("change", function () {
+      fetchJobsForGarment(garmentSelect, jobSelect);
+      priceInput.value = "";
+    });
+
+    jobSelect.addEventListener("change", function () {
+      calculateTotalPrice(garmentSelect, jobSelect, newRow);
+    });
+
+    priceInput.addEventListener('input', function () {
+      overrideTotalPrice(garmentSelect, jobSelect, newRow);
+    });
+
+    descriptionInput.addEventListener('input', function () {
+      overrideTotalPrice(garmentSelect, jobSelect, newRow);
+    });
+
+    // Show the "X" button in all rows except the first one
+    const rows = document.querySelectorAll("#TBody tr");
+    rows.forEach((row) => {
+      row.querySelector(".btn-delete").style.display = "inline-block";
+    });
+
+    // Recalculate total order price
+    calculateOrderTotal();
+  }
+
+  // Function to calculate the total order price
+  function calculateOrderTotal() {
+    const totalPriceElement = document.querySelector('p[name="total_price"]');
+    const subtotalElement = document.querySelector('p[name="subtotal"]');
+    const salesTaxElement = document.querySelector('p[name="sales_tax"]');
+
+    const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
+    const salesTax = total * 0.0826; //
+    const subtotal = total;
+
+    subtotalElement.textContent = `Subtotal: $${subtotal.toFixed(2)}`;
+    salesTaxElement.textContent = `Sales tax: $${salesTax.toFixed(2)}`;
+    totalPriceElement.textContent = `Total price: $${(subtotal + salesTax).toFixed(2)}`;
+  }
+
+  // Attach the event listener to the first row when the page loads
+  window.addEventListener("DOMContentLoaded", function () {
+    const firstRow = document.querySelector("#TBody tr");
+    const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
+    const firstRowJobSelect = firstRow.querySelector(".jobSelect");
+    const firstRowPriceInput = firstRow.querySelector(".price");
+    const firstRowDescriptionInput = firstRow.querySelector('.descriptionBox');
+    const firstRowPhotoInput = firstRow.querySelector('.photo');
+
+    firstRowGarmentSelect.addEventListener("change", function () {
+      fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
+      firstRowPriceInput.value = "";
+    });
+    firstRowJobSelect.addEventListener("change", function () {
+      calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+    });
+    firstRowPriceInput.addEventListener('input', function () {
+      overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+    });
+    firstRowDescriptionInput.addEventListener('input', function () {
+      overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+    });
+    /*   firstRowPhotoInput.addEventListener('change', function() {
+        overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
+        
+        // Extract and display only the filename
+        const fullPath = firstRowPhotoInput.value;
+        const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
+        firstRow.querySelector('.photoLabel').innerHTML = filename;
+      }); */
   });
-
-  jobSelect.addEventListener("change", function () {
-    calculateTotalPrice(garmentSelect, jobSelect, newRow);
-  });
-
-  priceInput.addEventListener('input', function () {
-    overrideTotalPrice(garmentSelect, jobSelect, newRow);
-  });
-
-  descriptionInput.addEventListener('input', function () {
-    overrideTotalPrice(garmentSelect, jobSelect, newRow);
-  });
-
-  // Show the "X" button in all rows except the first one
-  const rows = document.querySelectorAll("#TBody tr");
-  rows.forEach((row) => {
-    row.querySelector(".btn-delete").style.display = "inline-block";
-  });
-
-  // Recalculate total order price
-  calculateOrderTotal();
-}
-
-// Function to calculate the total order price
-function calculateOrderTotal() {
-  const totalPriceElement = document.querySelector('p[name="total_price"]');
-  const subtotalElement = document.querySelector('p[name="subtotal"]');
-  const salesTaxElement = document.querySelector('p[name="sales_tax"]');
-
-  const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
-  const salesTax = total * 0.0826; //
-  const subtotal = total;
-
-  subtotalElement.textContent = `Subtotal: $${subtotal.toFixed(2)}`;
-  salesTaxElement.textContent = `Sales tax: $${salesTax.toFixed(2)}`;
-  totalPriceElement.textContent = `Total price: $${(subtotal + salesTax).toFixed(2)}`;
-}
-
-// Attach the event listener to the first row when the page loads
-window.addEventListener("DOMContentLoaded", function () {
-  const firstRow = document.querySelector("#TBody tr");
-  const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
-  const firstRowJobSelect = firstRow.querySelector(".jobSelect");
-  const firstRowPriceInput = firstRow.querySelector(".price");
-  const firstRowDescriptionInput = firstRow.querySelector('.descriptionBox');
-  const firstRowPhotoInput = firstRow.querySelector('.photo');
-
-  firstRowGarmentSelect.addEventListener("change", function () {
-    fetchJobsForGarment(firstRowGarmentSelect, firstRowJobSelect);
-    firstRowPriceInput.value = "";
-  });
-  firstRowJobSelect.addEventListener("change", function () {
-    calculateTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
-  });
-  firstRowPriceInput.addEventListener('input', function() {
-    overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
-  });
-  firstRowDescriptionInput.addEventListener('input', function() {
-    overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
-  });
-/*   firstRowPhotoInput.addEventListener('change', function() {
-    overrideTotalPrice(firstRowGarmentSelect, firstRowJobSelect, firstRow);
-    
-    // Extract and display only the filename
-    const fullPath = firstRowPhotoInput.value;
-    const filename = fullPath.replace(/^.*[\\\/]/, ''); // This extracts the filename
-    firstRow.querySelector('.photoLabel').innerHTML = filename;
-  }); */
-});
-
-// Hide the "X" button in the last row if there's only one row left
-const rows = document.querySelectorAll("#TBody tr");
-if (rows.length === 1) {
-  rows[0].querySelector(".btn-delete").style.display = "none";
-}
-
-// Function to handle deleting a row
-function BtnDel(button) {
-  // Get the table row containing the button
-  const row = button.parentNode.parentNode;
-
-  // Remove the row from the table body
-  const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
-  itemTotalPrices.splice(rowIndex, 1); // Remove the corresponding price from the array
-  row.remove();
 
   // Hide the "X" button in the last row if there's only one row left
   const rows = document.querySelectorAll("#TBody tr");
@@ -250,195 +241,211 @@ function BtnDel(button) {
     rows[0].querySelector(".btn-delete").style.display = "none";
   }
 
-  // Update order total after deletion
-  calculateOrderTotal();
-}
+  // Function to handle deleting a row
+  function BtnDel(button) {
+    // Get the table row containing the button
+    const row = button.parentNode.parentNode;
 
-// Get the input element
-const inputElement = document.getElementById("example");
+    // Remove the row from the table body
+    const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+    itemTotalPrices.splice(rowIndex, 1); // Remove the corresponding price from the array
+    row.remove();
 
-// Get today's date and format it as 'YYYY-MM-DD'
-const today = new Date().toISOString().split("T")[0];
+    // Hide the "X" button in the last row if there's only one row left
+    const rows = document.querySelectorAll("#TBody tr");
+    if (rows.length === 1) {
+      rows[0].querySelector(".btn-delete").style.display = "none";
+    }
 
-// Set the 'min' attribute of the input element to today's date
-inputElement.setAttribute("min", today);
-
-const phoneInput = document.getElementById('phone');
-
-phoneInput.addEventListener('input', function() {
-  const unformattedValue = phoneInput.value.replace(/\D/g, '');
-  const formattedValue = formatPhoneNumber(unformattedValue);
-  phoneInput.value = formattedValue;
-});
-
-function formatPhoneNumber(number) {
-  const numberLength = number.length;
-  if (numberLength <= 3) {
-    return number;
-  } else if (numberLength <= 7) {
-    return `${number.slice(0, 3)}-${number.slice(3)}`;
-  } else {
-    return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
-  }
-}
-
-const priceInput = document.getElementById('price');
-
-priceInput.addEventListener('input', function() {
-  const unformattedValue = priceInput.value.replace(/[^\d.]/g, ''); // Keep only digits and decimal point
-  const formattedValue = formatPrice(unformattedValue); // Format the price as needed
-  priceInput.value = formattedValue;
-});
-
-function formatPrice(price) {
-  // Remove extra decimal points
-  price = price.replace(/\.{2,}/g, '.');
-
-  // Limit to two decimal places
-  const parts = price.split('.');
-  if (parts.length > 1) {
-    parts[1] = parts[1].substr(0, 2);
-    price = parts.join('.');
+    // Update order total after deletion
+    calculateOrderTotal();
   }
 
-  return price;
-}
+  // Get the input element
+  const inputElement = document.getElementById("example");
 
-const firstNameInput = document.getElementById('first-name');
-const lastNameInput = document.getElementById('last-name');
+  // Get today's date and format it as 'YYYY-MM-DD'
+  const today = new Date().toISOString().split("T")[0];
 
-firstNameInput.addEventListener('input', function() {
-  const cleanedValue = firstNameInput.value.replace(/[^A-Za-z]/g, '');
-  firstNameInput.value = cleanedValue;
-});
+  // Set the 'min' attribute of the input element to today's date
+  inputElement.setAttribute("min", today);
 
-lastNameInput.addEventListener('input', function() {
-  const cleanedValue = lastNameInput.value.replace(/[^A-Za-z]/g, '');
-  lastNameInput.value = cleanedValue;
-});
+  const phoneInput = document.getElementById('phone');
 
-function fetchJobsForGarment(selectElement, jobSelect) {
-  const garmentId = selectElement.value;
+  phoneInput.addEventListener('input', function () {
+    const unformattedValue = phoneInput.value.replace(/\D/g, '');
+    const formattedValue = formatPhoneNumber(unformattedValue);
+    phoneInput.value = formattedValue;
+  });
 
-  // Use AJAX to fetch jobs for the selected garment
-  fetch(`/get_jobs_for_garment/${garmentId}`)
-    .then(response => response.json())
-    .then(data => {
-      // Remove all options from the job select dropdown of the current row
-      while (jobSelect.options.length > 0) {
-        jobSelect.remove(0);
-      }
+  function formatPhoneNumber(number) {
+    const numberLength = number.length;
+    if (numberLength <= 3) {
+      return number;
+    } else if (numberLength <= 7) {
+      return `${number.slice(0, 3)}-${number.slice(3)}`;
+    } else {
+      return `${number.slice(0, 3)}-${number.slice(3, 6)}-${number.slice(6, 10)}`;
+    }
+  }
 
-      // Add job options for the selected garment to the job select dropdown of the current row
-      data.jobs.forEach(job => {
-        const option = document.createElement("option");
-        option.value = job.id;
-        option.text = job.name;
-        jobSelect.appendChild(option);
-      });
-    })
-    .catch(error => {
-      console.error('Error fetching jobs:', error);
-    });
-}
+  const priceInput = document.getElementById('price');
 
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function () {
-  'use strict'
+  priceInput.addEventListener('input', function () {
+    const unformattedValue = priceInput.value.replace(/[^\d.]/g, ''); // Keep only digits and decimal point
+    const formattedValue = formatPrice(unformattedValue); // Format the price as needed
+    priceInput.value = formattedValue;
+  });
 
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  var forms = document.querySelectorAll('.needs-validation')
+  function formatPrice(price) {
+    // Remove extra decimal points
+    price = price.replace(/\.{2,}/g, '.');
 
-  // Loop over them and prevent submission
-  Array.prototype.slice.call(forms)
-    .forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
+    // Limit to two decimal places
+    const parts = price.split('.');
+    if (parts.length > 1) {
+      parts[1] = parts[1].substr(0, 2);
+      price = parts.join('.');
+    }
+
+    return price;
+  }
+
+  const firstNameInput = document.getElementById('first-name');
+  const lastNameInput = document.getElementById('last-name');
+
+  firstNameInput.addEventListener('input', function () {
+    const cleanedValue = firstNameInput.value.replace(/[^A-Za-z]/g, '');
+    firstNameInput.value = cleanedValue;
+  });
+
+  lastNameInput.addEventListener('input', function () {
+    const cleanedValue = lastNameInput.value.replace(/[^A-Za-z]/g, '');
+    lastNameInput.value = cleanedValue;
+  });
+
+  function fetchJobsForGarment(selectElement, jobSelect) {
+    const garmentId = selectElement.value;
+
+    // Use AJAX to fetch jobs for the selected garment
+    fetch(`/get_jobs_for_garment/${garmentId}`)
+      .then(response => response.json())
+      .then(data => {
+        // Remove all options from the job select dropdown of the current row
+        while (jobSelect.options.length > 0) {
+          jobSelect.remove(0);
         }
 
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
-
-// Update the calculateTotalPrice function
-function calculateTotalPrice(garmentSelect, jobSelect, row) {
-  const garmentId = garmentSelect.value;
-  const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
-
-  const priceInput = row.querySelector(".price");
-  const itemInput = row.querySelector(".itemArray");
-  const descriptionInput = row.querySelector(".descriptionBox").value;
-
-  if (!selectedJobIds.length || !garmentId) {
-    priceInput.value = "";
-    return;
+        // Add job options for the selected garment to the job select dropdown of the current row
+        data.jobs.forEach(job => {
+          const option = document.createElement("option");
+          option.value = job.id;
+          option.text = job.name;
+          jobSelect.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching jobs:', error);
+      });
   }
 
-  // Use AJAX to fetch the prices for the selected garment and jobs
-  fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
-    .then(response => response.json())
-    .then(data => {
-      priceInput.value = data.totalPrice;
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (function () {
+    'use strict'
 
-      // Update the itemTotalPrices array
-      const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
-      itemTotalPrices[rowIndex] = data.totalPrice;
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
 
-      // Create order item
-      const orderItem = {
-        price: data.totalPrice,
-        jobs: data.jobPairs,
-        description: descriptionInput,
-      };
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+      .forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
 
-      itemInput.value = JSON.stringify(orderItem);
+          form.classList.add('was-validated')
+        }, false)
+      })
+  })()
 
-      // Update order total
-      calculateOrderTotal();
-    })
-    .catch(error => {
-      console.error('Error calculating total price:', error);
-    });
-}
+  // Update the calculateTotalPrice function
+  function calculateTotalPrice(garmentSelect, jobSelect, row) {
+    const garmentId = garmentSelect.value;
+    const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
 
-// Update the overrideTotalPrice function
-function overrideTotalPrice(garmentSelect, jobSelect, row) {
-  const garmentId = garmentSelect.value;
-  const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+    const priceInput = row.querySelector(".price");
+    const itemInput = row.querySelector(".itemArray");
+    const descriptionInput = row.querySelector(".descriptionBox").value;
 
-  const priceValue = row.querySelector(".price").value;
-  const itemInput = row.querySelector(".itemArray");
-  const descriptionInput = row.querySelector(".descriptionBox").value;
+    if (!selectedJobIds.length || !garmentId) {
+      priceInput.value = "";
+      return;
+    }
 
-  if (!selectedJobIds.length || !garmentId) return;
+    // Use AJAX to fetch the prices for the selected garment and jobs
+    fetch(`/calculate_total_price/${garmentId}/${selectedJobIds.join(",")}`)
+      .then(response => response.json())
+      .then(data => {
+        priceInput.value = data.totalPrice;
 
-  // Use AJAX to fetch the prices for the selected garment and jobs
-  fetch(`/get_job_pairs/${garmentId}/${selectedJobIds.join(",")}`)
-    .then(response => response.json())
-    .then(data => {
-      // Update the itemTotalPrices array
-      const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
-      itemTotalPrices[rowIndex] = priceValue;
+        // Update the itemTotalPrices array
+        const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+        itemTotalPrices[rowIndex] = data.totalPrice;
 
-      // Create order item
-      const orderItem = {
-        price: priceValue,
-        jobs: data.jobPairs,
-        description: descriptionInput,
-      };
+        // Create order item
+        const orderItem = {
+          price: data.totalPrice,
+          jobs: data.jobPairs,
+          description: descriptionInput,
+        };
 
-      itemInput.value = JSON.stringify(orderItem);
+        itemInput.value = JSON.stringify(orderItem);
 
-      // Update order total
-      calculateOrderTotal();
-    })
-    .catch(error => {
-      console.error('Error retrieving job pairs:', error);
-    });
-}
+        // Update order total
+        calculateOrderTotal();
+      })
+      .catch(error => {
+        console.error('Error calculating total price:', error);
+      });
+  }
+
+  // Update the overrideTotalPrice function
+  function overrideTotalPrice(garmentSelect, jobSelect, row) {
+    const garmentId = garmentSelect.value;
+    const selectedJobIds = Array.from(jobSelect.selectedOptions).map(option => option.value);
+
+    const priceValue = row.querySelector(".price").value;
+    const itemInput = row.querySelector(".itemArray");
+    const descriptionInput = row.querySelector(".descriptionBox").value;
+
+    if (!selectedJobIds.length || !garmentId) return;
+
+    // Use AJAX to fetch the prices for the selected garment and jobs
+    fetch(`/get_job_pairs/${garmentId}/${selectedJobIds.join(",")}`)
+      .then(response => response.json())
+      .then(data => {
+        // Update the itemTotalPrices array
+        const rowIndex = Array.from(document.querySelectorAll("#TBody tr")).indexOf(row);
+        itemTotalPrices[rowIndex] = priceValue;
+
+        // Create order item
+        const orderItem = {
+          price: priceValue,
+          jobs: data.jobPairs,
+          description: descriptionInput,
+        };
+
+        itemInput.value = JSON.stringify(orderItem);
+
+        // Update order total
+        calculateOrderTotal();
+      })
+      .catch(error => {
+        console.error('Error retrieving job pairs:', error);
+      });
+  }
 
 </script>
 
