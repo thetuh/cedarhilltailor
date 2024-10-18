@@ -155,7 +155,7 @@ def search_number(phone_number):
     if customer:
         cid = customer.id
 
-    order_pagination = Order.query.filter_by(customer_id=cid).paginate(page=page, per_page=per_page)
+    order_pagination = Order.query.filter_by(customer_id=cid).order_by(Order.id.desc()).paginate(page=page, per_page=per_page)
 
     return render_template('search-number.html', order_pagination=order_pagination, phone_number=phone_number)
 
