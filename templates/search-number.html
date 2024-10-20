@@ -39,6 +39,10 @@
                 <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal"
                     data-bs-target="#modalupdate{{order.id}}">Update status</button>
                 <a href="/edit-order/{{ order.id }}" class="btn btn-sm btn-warning">Modify details</a>
+                {% if order.status == 1 %}
+                    <a href="/text-alert{{ order.id }}" class="btn btn-sm btn-success"
+                        onclick="return confirm('Are you sure you want send a text for pickup?')">Text for pickup</a>
+                {% endif %}
             </td>
             {% elif has_role(current_user, 'seamstress') %}
             <td>
