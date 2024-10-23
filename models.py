@@ -101,3 +101,8 @@ class Customer(db.Model):
 
     # One-to-many (Order)
     orders = db.relationship('Order', backref='customer', lazy='joined')
+
+class Globals(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    store_name = db.Column(db.String(100), nullable=False, default='Cedar Hill Tailor')
+    sales_tax_rate = db.Column(db.Float, nullable=False, default=0.0826)

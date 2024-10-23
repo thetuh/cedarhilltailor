@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
 from sqlalchemy import desc, not_, func
-from models import User, Role, Garment, Job, GarmentJobPair, Order, OrderItem, Customer, ItemJob, JobStatus, OrderStatus
+from models import User, Role, Garment, Job, GarmentJobPair, Order, OrderItem, Customer, ItemJob, JobStatus, OrderStatus, Globals
 from application import application, db
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -16,9 +16,46 @@ import json
 views = Blueprint('views', __name__)
 
 MAX_ITEMS_PER_PAGE = 8
-SALES_TAX_RATE = 0.0826
 
 # [ HELPER METHODS ] -----------------------------------------------
+@views.route('/get-sales-tax-rate', methods=['GET'])
+def get_sales_tax_rate():
+    globals_record = Globals.query.first()
+    if globals_record:
+        return jsonify({'sales_tax_rate': float(globals_record.sales_tax_rate)})
+    return jsonify({'sales_tax_rate': 0.0})
+
+def fetch_sales_tax_rate():
+    globals_record = Globals.query.first()
+    if globals_record:
+        return globals_record.sales_tax_rate
+    return None
+
+@views.route('/update-sales-tax-rate', methods=['POST'])
+@login_required
+@manager_required
+def update_sales_tax_rate():
+    try:
+        data = request.json
+        new_rate = float(data.get('new_rate', 0))
+
+        # Not less than 0% or bigger than 100%
+        if new_rate < 0 or new_rate > 1:
+            return jsonify({'error': 'Invalid sales tax rate'}), 400
+
+        # Fetch the existing Globals record
+        globals_record = Globals.query.first()
+        if globals_record is None:
+            return jsonify({'error': 'Globals record not found'}), 404
+        
+        # Update the sales tax rate
+        globals_record.sales_tax_rate = new_rate
+        db.session.commit()  # Commit the changes to the database
+
+        return jsonify({'success': True, 'new_rate': globals_record.sales_tax_rate}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 def validate_order_input(first_name, last_name, phone_number, completion_date):
     errors = []
     if not first_name:
@@ -230,7 +267,7 @@ def create_order():
             subtotal += price  # Add to subtotal
             order_items_data.append(order_item)
 
-        sales_tax = subtotal * Decimal(SALES_TAX_RATE)  # Calculate sales tax
+        sales_tax = subtotal * Decimal(fetch_sales_tax_rate())  # Calculate sales tax
         total_price = subtotal + sales_tax  # Calculate total price including tax
 
         # Check if customer exists or create a new one
@@ -279,11 +316,6 @@ def create_order():
             return render_template('create-order.html', garment_list=garment_list)
 
     return render_template('create-order.html', garment_list=garment_list)
-
-@views.route('/get-sales-tax-rate', methods=['GET'])
-def get_sales_tax_rate():
-    sales_tax_rate = SALES_TAX_RATE
-    return jsonify({'sales_tax_rate': float(sales_tax_rate)})
 
 @views.route('/edit-order/<int:order_id>', methods=['GET', 'POST'])
 @login_required
@@ -350,7 +382,7 @@ def edit_order_hard(order_id):
                 total_price += Decimal(order_item_data.get('price', 0))
                 process_order_item(order_item_data, order_id=order.id)
 
-            total_price += Decimal(SALES_TAX_RATE) * total_price
+            total_price += Decimal(fetch_sales_tax_rate()) * total_price
 
             # Update order price
             order.price = total_price

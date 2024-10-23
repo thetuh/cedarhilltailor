@@ -1,5 +1,5 @@
-{% extends "base.html" %}
-{% block title %}store{% endblock %}
+{% extends "base.html" %} 
+{% block title %}store{% endblock %} 
 
 {% block content %}
 <br>
@@ -10,6 +10,34 @@
     <a href="/store/garments" class="btn btn-primary" role="button">Garments</a>
     <a href="/store/jobs" class="btn btn-primary" role="button">Jobs</a>
     <a href="/store/pairs" class="btn btn-primary" role="button">Pairs</a>
+
+    <!-- Button to open modal -->
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#taxModal">
+        Update Sales Tax Rate
+    </button>
+</div>
+
+<!-- Modal for updating the sales tax rate -->
+<div class="modal fade" id="taxModal" tabindex="-1" aria-labelledby="taxModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taxModalLabel">Update Sales Tax Rate</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Current sales tax rate: <span id="currentSalesTax">8.26%</span></p> <!-- Display current tax rate -->
+                <div class="mb-3">
+                    <label for="newTaxRate" class="form-label">Enter New Sales Tax Rate:</label>
+                    <input type="number" class="form-control" id="newTaxRate" placeholder="Enter new tax rate (%)" min="0" max="100" step="0.01">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveSalesTax()">Save changes</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -17,13 +45,56 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        /* To center-align buttons horizontally */
     }
 
     .btn {
         margin-bottom: 20px;
-        /* Add some spacing between buttons */
     }
 </style>
+
+<!-- Optional: Include Bootstrap JS if not already included -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript to handle fetching and updating the sales tax -->
+<script>
+    // Fetch current sales tax rate from the server
+    async function fetchSalesTaxRate() {
+        const response = await fetch('/get-sales-tax-rate');
+        const data = await response.json();
+        document.getElementById('currentSalesTax').textContent = (data.sales_tax_rate * 100).toFixed(2) + '%';
+    }
+
+    // Save the new sales tax rate
+    async function saveSalesTax() {
+        const newTaxRate = parseFloat(document.getElementById('newTaxRate').value);
+        if (isNaN(newTaxRate) || newTaxRate < 0 || newTaxRate > 100) {
+            alert('Please enter a valid sales tax rate between 0 and 100.');
+            return;
+        }
+
+        // Convert percentage to decimal
+        const newTaxRateDecimal = newTaxRate / 100;
+
+        // Make POST request to update sales tax rate
+        const response = await fetch('/update-sales-tax-rate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ new_rate: newTaxRateDecimal })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Sales tax rate updated successfully.');
+            document.getElementById('currentSalesTax').textContent = newTaxRate.toFixed(2) + '%';
+        } else {
+            alert('Error updating sales tax rate: ' + result.error);
+        }
+    }
+
+    // Fetch the current sales tax rate when the page loads
+    document.addEventListener('DOMContentLoaded', fetchSalesTaxRate);
+</script>
 
 {% endblock %}
