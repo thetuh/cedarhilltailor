@@ -515,14 +515,22 @@
       });
   }
 
+  async function fetchSalesTaxRate() {
+    const response = await fetch('/get-sales-tax-rate');
+    const data = await response.json();
+    return data.sales_tax_rate;
+  }
+
   // Function to calculate the total order price
-  function calculateOrderTotal() {
+  async function calculateOrderTotal() {
     const totalPriceElement = document.querySelector('p[name="total_price"]');
     const subtotalElement = document.querySelector('p[name="subtotal"]');
     const salesTaxElement = document.querySelector('p[name="sales_tax"]');
 
     const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
-    const salesTax = total * 0.0826; //
+
+    const salesTaxRate = await fetchSalesTaxRate();
+    const salesTax = total * salesTaxRate;
     const subtotal = total;
 
     subtotalElement.textContent = `Subtotal: $${subtotal.toFixed(2)}`;

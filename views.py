@@ -16,6 +16,7 @@ import json
 views = Blueprint('views', __name__)
 
 MAX_ITEMS_PER_PAGE = 8
+SALES_TAX_RATE = 0.0826
 
 # [ HELPER METHODS ] -----------------------------------------------
 def validate_order_input(first_name, last_name, phone_number, completion_date):
@@ -229,9 +230,7 @@ def create_order():
             subtotal += price  # Add to subtotal
             order_items_data.append(order_item)
 
-        # Define sales tax rate (e.g., 8.26% tax)
-        sales_tax_rate = Decimal('0.0826')  # Adjust this as needed
-        sales_tax = subtotal * sales_tax_rate  # Calculate sales tax
+        sales_tax = subtotal * Decimal(SALES_TAX_RATE)  # Calculate sales tax
         total_price = subtotal + sales_tax  # Calculate total price including tax
 
         # Check if customer exists or create a new one
@@ -280,6 +279,11 @@ def create_order():
             return render_template('create-order.html', garment_list=garment_list)
 
     return render_template('create-order.html', garment_list=garment_list)
+
+@views.route('/get-sales-tax-rate', methods=['GET'])
+def get_sales_tax_rate():
+    sales_tax_rate = SALES_TAX_RATE
+    return jsonify({'sales_tax_rate': float(sales_tax_rate)})
 
 @views.route('/edit-order/<int:order_id>', methods=['GET', 'POST'])
 @login_required
@@ -346,9 +350,7 @@ def edit_order_hard(order_id):
                 total_price += Decimal(order_item_data.get('price', 0))
                 process_order_item(order_item_data, order_id=order.id)
 
-            # Define sales tax rate (e.g., 8.26% tax)
-            sales_tax_rate = Decimal('0.0826')  # Adjust this as needed
-            total_price += sales_tax_rate * total_price
+            total_price += Decimal(SALES_TAX_RATE) * total_price
 
             # Update order price
             order.price = total_price
