@@ -417,13 +417,13 @@ def calculate_total_price(garment_id, job_ids):
             
     return jsonify({"totalPrice": total_price, "jobPairs": job_pairs})
 
-@views.route('/inventory')
+@views.route('/store')
 @login_required
 @manager_required
-def manage_inventory():
-    return render_template('inventory.html')
+def manage_store():
+    return render_template('store.html')
 
-@views.route('/inventory/garments')
+@views.route('/store/garments')
 @login_required
 @manager_required
 def garments():
@@ -437,7 +437,7 @@ def garments():
 
     return render_template('garments.html', garments_pagination=garments_pagination)
 
-@views.route('/inventory/jobs')
+@views.route('/store/jobs')
 @login_required
 @manager_required
 def jobs():
@@ -453,7 +453,7 @@ def jobs():
 
     return render_template('jobs.html', jobs_pagination=jobs_pagination, garment_list=garment_list)
 
-@views.route('/inventory/pairs', methods=['GET', 'POST'])
+@views.route('/store/pairs', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def pairs():
@@ -483,7 +483,7 @@ def manage_users():
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
-@views.route('/inventory/garments/delete/<int:id>')
+@views.route('/store/garments/delete/<int:id>')
 @login_required
 @manager_required
 def delete_garment(id):
@@ -498,7 +498,7 @@ def delete_garment(id):
     flash(f"Successfully deleted' '{garment.name}'", category='success')
     return redirect(url_for('views.garments'))
 
-@views.route('/inventory/jobs/delete/<int:id>')
+@views.route('/store/jobs/delete/<int:id>')
 @login_required
 @manager_required
 def delete_job(id):
@@ -513,7 +513,7 @@ def delete_job(id):
     flash(f"Successfully deleted' '{job.name}'", category='success')
     return redirect(url_for('views.jobs'))
 
-@views.route('/inventory/pairs/delete/<int:id>')
+@views.route('/store/pairs/delete/<int:id>')
 @login_required
 @manager_required
 def delete_pair(id):
@@ -572,7 +572,7 @@ def delete_user(id):
     flash(f"Successfully deleted '{user.username}'", category='success')
     return redirect(url_for('views.manage_users'))
 
-@views.route('/inventory/garments/create', methods=['GET', 'POST'])
+@views.route('/store/garments/create', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def create_garment():
@@ -600,7 +600,7 @@ def create_garment():
 
     return render_template('garments.html')
 
-@views.route('/inventory/jobs/create', methods=['GET', 'POST'])
+@views.route('/store/jobs/create', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def create_job():
@@ -669,7 +669,7 @@ def create_user():
 
     return render_template('users.html')
 
-@views.route('/inventory/garments/edit', methods=['GET', 'POST'])
+@views.route('/store/garments/edit', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def edit_garment():
@@ -697,7 +697,7 @@ def edit_garment():
 
     return render_template('garments.html')
 
-@views.route('/inventory/jobs/edit', methods=['GET', 'POST'])
+@views.route('/store/jobs/edit', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def edit_job():
@@ -725,7 +725,7 @@ def edit_job():
 
     return render_template('jobs.html')
 
-@views.route('/inventory/pairs/edit', methods=['GET', 'POST'])
+@views.route('/store/pairs/edit', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def edit_pair():
@@ -753,7 +753,7 @@ def edit_pair():
 
     return render_template('pairs.html')
 
-@views.route('/inventory/pairs/create', methods=['GET', 'POST'])
+@views.route('/store/pairs/create', methods=['GET', 'POST'])
 @login_required
 @manager_required
 def create_garment_job_pair():
