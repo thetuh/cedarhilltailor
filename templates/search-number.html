@@ -78,6 +78,7 @@
                                 <tr>
                                     <th>Job</th>
                                     <th>Status</th>
+                                    <th>Completed by</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,6 +90,7 @@
                                             name="job_status_{{ item_job.item_id }}_{{ item_job.pair_id }}" value="1" {%
                                             if item_job.status==1 %}checked{% endif %} disabled>
                                     </td>
+                                    <td>{{item_job.completed_by.username}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -127,7 +129,6 @@
                                 <tr>
                                     <th>Job</th>
                                     <th>Status</th>
-                                    <th>Completed by</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -139,11 +140,9 @@
                                             name="job_status_{{ item_job.item_id }}_{{ item_job.pair_id }}" value="1" {%
                                             if item_job.status==1 %}checked{% endif %}>
                                     </td>
-                                    <td>{{item_job.completed_by.username}}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
-
                         </table><br>
                         {% endfor %}
                     </div>
