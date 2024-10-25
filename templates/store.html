@@ -1,5 +1,5 @@
 {% extends "base.html" %} 
-{% block title %}store{% endblock %} 
+{% block title %}Store{% endblock %} 
 
 {% block content %}
 <br>
@@ -13,7 +13,7 @@
 
     <!-- Button to open modal -->
     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#taxModal">
-        Update Sales Tax Rate
+        Edit sales tax rate
     </button>
 </div>
 
@@ -22,14 +22,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="taxModalLabel">Update Sales Tax Rate</h5>
+                <h5 class="modal-title" id="taxModalLabel">Edit sales tax rate</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Current sales tax rate: <span id="currentSalesTax">8.26%</span></p> <!-- Display current tax rate -->
                 <div class="mb-3">
-                    <label for="newTaxRate" class="form-label">Enter New Sales Tax Rate:</label>
-                    <input type="number" class="form-control" id="newTaxRate" placeholder="Enter new tax rate (%)" min="0" max="100" step="0.01">
+                    <input type="number" class="form-control" id="newTaxRate" placeholder="New sales tax rate (%)" min="0" max="100" step="0.01">
                 </div>
             </div>
             <div class="modal-footer">
