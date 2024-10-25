@@ -31,9 +31,10 @@
                     <input type="number" class="form-control" id="newTaxRate" placeholder="New sales tax rate (%)" min="0" max="100" step="0.01">
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="saveSalesTax()">Save changes</button>
+            <div id="wrapper">
+                <button style='margin-right:16px' class="btn btn-primary" onclick="saveSalesTax()">Confirm</button>
+                <button style='margin-right:16px' type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
