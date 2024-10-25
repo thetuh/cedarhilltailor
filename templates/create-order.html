@@ -91,8 +91,8 @@
               </td>
               <td style="width: 25%; position: relative;">
                 <div class="custom-file">
-                  <input type="file" class="custom-file-input photo" id="inputGroupFile01" name="image[]">
-                  <label class="custom-file-label photoLabel" for="inputGroupFile01">Upload image</label>
+                  <input type="file" class="custom-file-input photo" id="image" name="image[]">
+                  <label class="custom-file-label photoLabel" for="imageLabel">Upload image</label>
                 </div>
                 <br>
                 <br>
@@ -102,6 +102,7 @@
               <td style="width: 1%;" class="NoPrint"><button type="button" class="btn btn-sm btn-danger btn-delete"
                   onclick="BtnDel(this)">X</button></td>
               <input type="hidden" name="item[]" class="itemArray">
+              <input type="hidden" name="image_url[]" class="image-url">
             </tr>
           </tbody>
         </table>
@@ -388,6 +389,9 @@
     const priceInput = row.querySelector(".price");
     const itemInput = row.querySelector(".itemArray");
     const descriptionInput = row.querySelector(".descriptionBox").value;
+    const uploadedImage = row.querySelector(".photo").files[0];
+    
+    // console.log(uploadedImage.name);
 
     if (!selectedJobIds.length || !garmentId) {
       priceInput.value = "";
@@ -409,6 +413,7 @@
           price: data.totalPrice,
           jobs: data.jobPairs,
           description: descriptionInput,
+          image: uploadedImage
         };
 
         itemInput.value = JSON.stringify(orderItem);
@@ -429,6 +434,7 @@
     const priceValue = row.querySelector(".price").value;
     const itemInput = row.querySelector(".itemArray");
     const descriptionInput = row.querySelector(".descriptionBox").value;
+    const uploadedImage = row.querySelector(".photo").files[0];
 
     if (!selectedJobIds.length || !garmentId) return;
 
@@ -445,6 +451,7 @@
           price: priceValue,
           jobs: data.jobPairs,
           description: descriptionInput,
+          image: uploadedImage
         };
 
         itemInput.value = JSON.stringify(orderItem);
@@ -465,10 +472,10 @@
 
 <!-- Script to update the file input label -->
 <script>
-  $(document).on('change', '.custom-file-input', function (event) {
-    let inputFile = event.currentTarget;
-    $(inputFile).parent().find('.custom-file-label').html(inputFile.files[0].name);
-  });
+$(document).on('change', '.custom-file-input', function (event) {
+    $(this).parent().find('.custom-file-label').html(event.target.files[0].name);
+});
+
 </script>
 
 {% endblock %}
