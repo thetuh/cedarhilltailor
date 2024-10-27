@@ -90,12 +90,12 @@
                 </div>
               </td>
               <td style="width: 25%; position: relative;">
-                <div class="custom-file">
+                <!-- <div class="custom-file">
                   <input type="file" class="custom-file-input photo" id="image" name="image[]">
                   <label class="custom-file-label photoLabel" for="imageLabel">Upload image</label>
                 </div>
                 <br>
-                <br>
+                <br> -->
                 <textarea name="description" style="position: absolute; height: 72%; width: 94%;"
                   class="form-control descriptionBox" id="exampleFormControlTextarea1" maxlength="255"></textarea>
               </td>
@@ -140,6 +140,7 @@
 
   // Initialize an array to hold the total prices of each item
   let itemTotalPrices = [];
+  let salesTaxRate;
 
   // Function to add a new row
   function BtnAdd() {
@@ -152,9 +153,7 @@
     newRow.querySelector(".descriptionBox").value = "";
     newRow.querySelector(".price").value = "";
     newRow.querySelector(".itemArray").value = "";
-    newRow.querySelector(".custom-file-input").value = ""; // Reset file input
-    newRow.querySelector(".custom-file-label").textContent = "Upload image"; // Reset file label
-
+    
     // Append the new row to the table body
     document.getElementById("TBody").appendChild(newRow);
 
@@ -192,7 +191,7 @@
   }
 
   async function fetchSalesTaxRate() {
-    const response = await fetch('/get-sales-tax-rate');
+    const response = await fetch('/fetch-sales-tax-rate');
     const data = await response.json();
     return data.sales_tax_rate;
   }
@@ -205,7 +204,7 @@
 
     const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
 
-    const salesTaxRate = await fetchSalesTaxRate();
+    // const salesTaxRate = await fetchSalesTaxRate();
     const salesTax = total * salesTaxRate;
     const subtotal = total;
 
@@ -215,7 +214,10 @@
   }
 
   // Attach the event listener to the first row when the page loads
-  window.addEventListener("DOMContentLoaded", function () {
+  window.addEventListener("DOMContentLoaded", async function () {
+
+    salesTaxRate = await fetchSalesTaxRate();
+
     const firstRow = document.querySelector("#TBody tr");
     const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
     const firstRowJobSelect = firstRow.querySelector(".jobSelect");
@@ -389,9 +391,6 @@
     const priceInput = row.querySelector(".price");
     const itemInput = row.querySelector(".itemArray");
     const descriptionInput = row.querySelector(".descriptionBox").value;
-    const uploadedImage = row.querySelector(".photo").files[0];
-    
-    // console.log(uploadedImage.name);
 
     if (!selectedJobIds.length || !garmentId) {
       priceInput.value = "";
@@ -413,7 +412,6 @@
           price: data.totalPrice,
           jobs: data.jobPairs,
           description: descriptionInput,
-          image: uploadedImage
         };
 
         itemInput.value = JSON.stringify(orderItem);
@@ -434,7 +432,6 @@
     const priceValue = row.querySelector(".price").value;
     const itemInput = row.querySelector(".itemArray");
     const descriptionInput = row.querySelector(".descriptionBox").value;
-    const uploadedImage = row.querySelector(".photo").files[0];
 
     if (!selectedJobIds.length || !garmentId) return;
 
@@ -451,7 +448,6 @@
           price: priceValue,
           jobs: data.jobPairs,
           description: descriptionInput,
-          image: uploadedImage
         };
 
         itemInput.value = JSON.stringify(orderItem);
@@ -471,11 +467,10 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
 <!-- Script to update the file input label -->
-<script>
+<!-- <script>
 $(document).on('change', '.custom-file-input', function (event) {
     $(this).parent().find('.custom-file-label').html(event.target.files[0].name);
 });
-
-</script>
+</script> -->
 
 {% endblock %}

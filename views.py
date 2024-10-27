@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Flask, g, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from flask_paginate import Pagination, get_page_args
 from auth import admin_required, manager_required
@@ -18,14 +19,14 @@ views = Blueprint('views', __name__)
 MAX_ITEMS_PER_PAGE = 8
 
 # [ HELPER METHODS ] -----------------------------------------------
-@views.route('/get-sales-tax-rate', methods=['GET'])
-def get_sales_tax_rate():
+@views.route('/fetch-sales-tax-rate', methods=['GET'])
+def fetch_sales_tax_rate():
     globals_record = Globals.query.first()
     if globals_record:
         return jsonify({'sales_tax_rate': float(globals_record.sales_tax_rate)})
     return jsonify({'sales_tax_rate': 0.0})
 
-def fetch_sales_tax_rate():
+def get_sales_tax_rate():
     globals_record = Globals.query.first()
     if globals_record:
         return globals_record.sales_tax_rate
@@ -102,6 +103,21 @@ def process_order_item(order_item_data, order_id):
             order.status = OrderStatus.INCOMPLETE.value
             new_item_job = ItemJob(item_id=new_order_item.id, pair_id=pair_id, status=job_status)
             db.session.add(new_item_job)
+
+def upload_image_to_bucket(file, filename):
+    from application import bucket
+    # Ensure filename is safe for saving
+    filename = secure_filename(filename)
+    blob = bucket.blob(f"images/{filename}")
+
+    # Upload the file
+    blob.upload_from_file(file, content_type=file.content_type)
+
+    # Make the file publicly accessible (optional)
+    blob.make_public()
+
+    # Return the URL to the uploaded file
+    return blob.public_url
 
 # [ GUEST / SEAMSTRESS ROUTES ] -----------------------------------------------
 @views.route('/')
@@ -267,7 +283,7 @@ def create_order():
             subtotal += price  # Add to subtotal
             order_items_data.append(order_item)
 
-        sales_tax = subtotal * Decimal(fetch_sales_tax_rate())  # Calculate sales tax
+        sales_tax = subtotal * Decimal(get_sales_tax_rate())  # Calculate sales tax
         total_price = subtotal + sales_tax  # Calculate total price including tax
 
         # Check if customer exists or create a new one
@@ -382,7 +398,7 @@ def edit_order_hard(order_id):
                 total_price += Decimal(order_item_data.get('price', 0))
                 process_order_item(order_item_data, order_id=order.id)
 
-            total_price += Decimal(fetch_sales_tax_rate()) * total_price
+            total_price += Decimal(get_sales_tax_rate()) * total_price
 
             # Update order price
             order.price = total_price

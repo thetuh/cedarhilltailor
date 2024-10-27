@@ -141,6 +141,7 @@
 
   // Initialize an array to hold the total prices of each item
   let itemTotalPrices = [];
+  let salesTaxRate;
 
   function BtnAdd() {
     // Clone the first row
@@ -261,7 +262,10 @@
   }
 
   // Attach the event listener to the first row when the page loads
-  window.addEventListener("DOMContentLoaded", function () {
+  window.addEventListener("DOMContentLoaded", async function () {
+
+    salesTaxRate = await fetchSalesTaxRate();
+
     const firstRow = document.querySelector("#TBody tr");
     const firstRowGarmentSelect = firstRow.querySelector(".garmentSelect");
     const firstRowJobSelect = firstRow.querySelector(".jobSelect");
@@ -516,7 +520,7 @@
   }
 
   async function fetchSalesTaxRate() {
-    const response = await fetch('/get-sales-tax-rate');
+    const response = await fetch('/fetch-sales-tax-rate');
     const data = await response.json();
     return data.sales_tax_rate;
   }
@@ -529,7 +533,7 @@
 
     const total = itemTotalPrices.reduce((acc, price) => acc + parseFloat(price || 0), 0);
 
-    const salesTaxRate = await fetchSalesTaxRate();
+    //const salesTaxRate = await fetchSalesTaxRate();
     const salesTax = total * salesTaxRate;
     const subtotal = total;
 

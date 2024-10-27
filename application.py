@@ -1,6 +1,7 @@
 import os
 import pymysql
 import sqlalchemy
+from google.cloud import storage
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -56,6 +57,10 @@ with application.app_context():
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(application)
+
+storage_client = storage.Client()
+bucket_name = "cedarhilltailor"
+bucket = storage_client.bucket(bucket_name)
 
 from models import User
 @login_manager.user_loader
