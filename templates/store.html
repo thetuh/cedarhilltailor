@@ -59,7 +59,7 @@
 <script>
     // Fetch current sales tax rate from the server
     async function fetchSalesTaxRate() {
-        const response = await fetch('/get-sales-tax-rate');
+        const response = await fetch('/fetch-sales-tax-rate');
         const data = await response.json();
         document.getElementById('currentSalesTax').textContent = (data.sales_tax_rate * 100).toFixed(2) + '%';
     }
