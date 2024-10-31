@@ -1,0 +1,26 @@
+{% extends "base.html" %} 
+{% block title %}Store{% endblock %} 
+
+{% block content %}
+<br>
+<h1 align="center">Analytics</h1>
+<br>
+
+<div id="wrapper">
+    <a href="/analytics/revenue" class="btn btn-primary" role="button">Revenue</a>
+    <a href="/analytics/performance" class="btn btn-primary" role="button">Performance</a>
+</div>
+
+<style>
+    #wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        margin-bottom: 20px;
+    }
+</style>
+
+{% endblock %}

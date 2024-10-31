@@ -531,6 +531,12 @@ def manage_users():
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
+@views.route('/analytics')
+@login_required
+@admin_required
+def analytics():
+    return render_template('analytics.html')
+
 @views.route('/store/garments/delete/<int:id>')
 @login_required
 @manager_required
