@@ -531,6 +531,18 @@ def manage_users():
     available_roles = Role.query.all()
     return render_template('users.html', users=users, available_roles=available_roles)
 
+@views.route('/performance')
+@login_required
+@admin_required
+def performance():
+    return render_template('performance.html')
+
+@views.route('/revenue')
+@login_required
+@admin_required
+def revenue():
+    return render_template('revenue.html')
+
 @views.route('/analytics')
 @login_required
 @admin_required
