@@ -80,23 +80,34 @@ def process_order_item(order_item_data, order_id):
         order_item.price = price
         order_item.description = description
 
-        # Update job pairs if needed
-        pair_ids = order_item_data.get('jobs', [])
-        existing_job_pairs = {job.pair_id for job in ItemJob.query.filter_by(item_id=order_item.id).all()}
+        # Retrieve existing job pairs
+        existing_item_jobs = ItemJob.query.filter_by(item_id=order_item.id).all()
+        existing_pair_ids = {job.pair_id for job in existing_item_jobs}
 
-        for pair_id in pair_ids:
-            if pair_id not in existing_job_pairs:
-                job_status = JobStatus.INCOMPLETE.value  # Convert enum to its integer value
-                order.status = OrderStatus.INCOMPLETE.value
-                new_item_job = ItemJob(item_id=order_item.id, pair_id=pair_id, status=job_status)
-                db.session.add(new_item_job)
+        # Get the new pair IDs from the form
+        pair_ids = order_item_data.get('jobs', [])
+        new_pair_ids = set(pair_ids)
+
+        # Determine pairs to delete (those that are in existing but not in new)
+        pairs_to_delete = existing_pair_ids - new_pair_ids
+        for pair_id in pairs_to_delete:
+            job_to_delete = ItemJob.query.filter_by(item_id=order_item.id, pair_id=pair_id).first()
+            if job_to_delete:
+                db.session.delete(job_to_delete)
+
+        # Add new job pairs that do not already exist
+        for pair_id in new_pair_ids - existing_pair_ids:
+            job_status = JobStatus.INCOMPLETE.value
+            order.status = OrderStatus.INCOMPLETE.value
+            new_item_job = ItemJob(item_id=order_item.id, pair_id=pair_id, status=job_status)
+            db.session.add(new_item_job)
 
     else:  # New order item
         new_order_item = OrderItem(order_id=order_id, price=price, description=description)
         db.session.add(new_order_item)
         db.session.flush()  # Flush to get new_order_item.id
 
-        # Handle job pairs for the new order item
+        # Add job pairs for the new order item
         pair_ids = order_item_data.get('jobs', [])
         for pair_id in pair_ids:
             job_status = JobStatus.INCOMPLETE.value
