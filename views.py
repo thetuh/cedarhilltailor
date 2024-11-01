@@ -219,14 +219,10 @@ def search_orders():
         query = query.filter(Order.completion_date <= completion_end_date)
 
     # Apply sorting
-    if sort_by == 'order_date_asc':
-        query = query.order_by(Order.order_date.asc())
-    elif sort_by == 'order_date_desc':
-        query = query.order_by(Order.order_date.desc())
-    elif sort_by == 'completion_date_asc':
-        query = query.order_by(Order.completion_date.asc())
-    elif sort_by == 'completion_date_desc':
-        query = query.order_by(Order.completion_date.desc())
+    if sort_by == 'order_id_asc':
+        query = query.order_by(Order.id.asc())
+    else:
+        query = query.order_by(Order.id.desc())
     
     # Paginate results
     order_pagination = query.paginate(page=page, per_page=per_page)
@@ -290,10 +286,10 @@ def edit_order():
         order = Order.query.get(order_id)
         if not order:
             flash('Order not found', category='error')
-            return redirect(url_for('views.search_id'))
+            return redirect(url_for('views.search_order'))
 
         # Add code to handle editing the order
-    return redirect(url_for('views.search_id'))
+    return redirect(url_for('views.search_order'))
 
 # [ MANAGER ROUTES ] ---------------------------------------------
 @views.route('/create-order', methods=['GET', 'POST'])

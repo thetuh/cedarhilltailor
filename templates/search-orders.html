@@ -49,10 +49,8 @@
     <div class="col">
       <label>Sort By</label>
       <select class="form-control" name="sort-by" id="sort-by">
-        <option value="order_date_desc">Order Date (Latest to Earliest)</option>
-        <option value="order_date_asc">Order Date (Earliest to Latest)</option>
-        <option value="completion_date_desc">Completion Date (Latest to Earliest)</option>
-        <option value="completion_date_asc">Completion Date (Earliest to Latest)</option>
+        <option value="order_id_desc">Order ID (High to Low)</option>
+        <option value="order_id_asc">Order ID (Low to High)</option>
       </select>
     </div>
   </div>
@@ -60,7 +58,7 @@
   <br>
 
   <div class="text-center">
-    <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="submit" class="btn btn-primary">Filter & Sort</button>
   </div>
 </form>
 
@@ -73,6 +71,7 @@
       <th>Completion Date</th>
       <th>Status</th>
       {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') or has_role(current_user, 'seamstress') %}
+      <th>Customer</th>
       <th>Actions</th>
       {% endif %}
     </tr>
@@ -85,6 +84,7 @@
       <td>{{ order.completion_date }}</td>
       <td>{{ 'In progress' if order.status == 0 else 'Complete' }}</td>
       {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
+      <td> {{ order.customer.first_name }} {{ order.customer.last_name }} </td>    
       <td>
           <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="modal"
               data-bs-target="#modaledit{{order.id}}">Overview</button>
