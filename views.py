@@ -677,7 +677,7 @@ def update_status(order_id):
     db.session.commit()
     
     flash('Job statuses updated successfully', 'success')
-    return redirect(url_for('views.search_id', order_id=order_id))
+    return redirect(url_for('views.search_orders', order_id=order_id))
 
 @views.route('/users/delete/<int:id>')
 @login_required
