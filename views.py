@@ -180,9 +180,58 @@ def home():
 
     return render_template('home.html')
 
-@views.route('/search-order')
-def search_order():
-    return render_template('search-order.html')
+@views.route('/search-orders')
+def search_orders():
+    page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
+    per_page = MAX_ITEMS_PER_PAGE
+
+    # Get filter and sort options from request arguments
+    order_id = request.args.get('order_id')
+
+    phone_number = request.args.get('phone_number')
+    if phone_number:
+        phone_number = phone_number.replace('-', '')
+
+    status = request.args.get('status')
+    start_date = request.args.get('order_start_date')
+    end_date = request.args.get('order_end_date')
+    completion_start_date = request.args.get('completion_start_date')
+    completion_end_date = request.args.get('completion_end_date')
+    sort_by = request.args.get('sort_by', 'order_date_desc')
+
+    # Base query with join to Customer for phone number filtering
+    query = Order.query.join(Customer).filter(Customer.id == Order.customer_id)
+
+    # Apply filters
+    if order_id:
+        query = query.filter(Order.id == order_id)
+    if phone_number:
+        query = query.filter(Customer.phone_number == phone_number)
+    if status:
+        query = query.filter(Order.status == int(status))
+    if start_date:
+        query = query.filter(Order.order_date >= start_date)
+    if end_date:
+        query = query.filter(Order.order_date <= end_date)
+    if completion_start_date:
+        query = query.filter(Order.completion_date >= completion_start_date)
+    if completion_end_date:
+        query = query.filter(Order.completion_date <= completion_end_date)
+
+    # Apply sorting
+    if sort_by == 'order_date_asc':
+        query = query.order_by(Order.order_date.asc())
+    elif sort_by == 'order_date_desc':
+        query = query.order_by(Order.order_date.desc())
+    elif sort_by == 'completion_date_asc':
+        query = query.order_by(Order.completion_date.asc())
+    elif sort_by == 'completion_date_desc':
+        query = query.order_by(Order.completion_date.desc())
+    
+    # Paginate results
+    order_pagination = query.paginate(page=page, per_page=per_page)
+
+    return render_template('search-orders.html', order_pagination=order_pagination)
 
 @views.route('/search-id/<int:order_id>')
 def search_id(order_id):
@@ -411,7 +460,7 @@ def edit_order_hard(order_id):
             error_message = f"An error occurred: {str(e)} at line {traceback.extract_tb(e.__traceback__)[0][1]}"
             flash(error_message, category='error')
 
-    return render_template('search-order.html', order=order, garment_list=garment_list)
+    return redirect(url_for('views.search_orders'))
 
 # Get jobs related to a specific garment
 @views.route('/get_jobs_for_garment/<int:garment_id>')
