@@ -199,8 +199,10 @@ def search_orders():
     # Get filter and sort options from request arguments
     order_id = request.args.get('order_id')
 
+    unstripped_phone_number = None
     phone_number = request.args.get('phone_number')
     if phone_number:
+        unstripped_phone_number = phone_number
         phone_number = phone_number.replace('-', '')
 
     status = request.args.get('status')
@@ -238,7 +240,11 @@ def search_orders():
     # Paginate results
     order_pagination = query.paginate(page=page, per_page=per_page)
 
-    return render_template('search-orders.html', order_pagination=order_pagination)
+    return render_template('search-orders.html', order_pagination=order_pagination,
+                           order_id=order_id, phone_number=unstripped_phone_number, status=status,
+                           order_start_date=start_date, order_end_date=end_date,
+                           completion_start_date=completion_start_date, completion_end_date=completion_end_date,
+                           sort_by=sort_by)
 
 @views.route('/search-id/<int:order_id>')
 def search_id(order_id):
