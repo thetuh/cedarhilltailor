@@ -280,9 +280,6 @@
   // Get today's date and format it as 'YYYY-MM-DD'
   const today = new Date().toISOString().split("T")[0];
 
-  // Set the 'min' attribute of the input element to today's date
-  inputElement.setAttribute("min", today);
-
   const phoneInput = document.getElementById('phone');
 
   phoneInput.addEventListener('input', function () {
