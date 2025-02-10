@@ -13,7 +13,8 @@ Admin Panel
 
 
 Customer Portal
-* Allow customers to track their order status through their order ID
+* Display business information, services, and a gallery of previously completed orders.
+* Allow customers to track their order status through their order ID.
 # Tech Stack
 * Containerization: Docker
 * Frontend: HTML, CSS, JavaScript
