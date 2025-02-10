@@ -1,5 +1,5 @@
 # CedarHillTailor
-CedarHillTailor is a serverless web application designed to modernize and streamline legacy tailor shops by digitizing order management, tracking employee performance, and enhancing customer engagement.
+CedarHillTailor is a containerized web application designed to modernize and streamline legacy tailor shops by digitizing order management, tracking employee performance, and enhancing customer engagement.
 # About
 * Built on a serverless architecture leveraging cloud services for scalability and reliability.
 * Provides an intuitive interface for tailoring businesses to manage customer orders, track alterations, and analyze business performance.
@@ -15,6 +15,7 @@ Admin Panel
 Customer Portal
 * Allow customers to track their order status through their order ID
 # Tech Stack
+* Containerization: Docker
 * Frontend: HTML, CSS, JavaScript
 * Backend: Python (Flask)
 * Database: MySQL (Cloud SQL)
