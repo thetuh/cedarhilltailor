@@ -10,6 +10,8 @@ Admin Panel
 * Store Management: Add, edit, and delete garment types, job types, and garment-job pairings.
 * User Management: Manage staff credentials, roles, and permissions.
 * Analytics Dashboard: Track revenue and order trends.
+
+
 Customer Portal
 * Allow customers to track their order status through their order ID
 # Tech Stack
