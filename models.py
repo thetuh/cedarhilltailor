@@ -10,6 +10,7 @@ class JobStatus(Enum):
 class OrderStatus(Enum):
     INCOMPLETE = 0
     COMPLETE = 1
+    PICKED_UP = 2
 
 class GarmentJobPair(db.Model):
     __tablename__ = 'garment_job_pair'
@@ -59,6 +60,7 @@ class OrderItem(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    legacy_id = db.Column(db.Integer, unique=True, nullable=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     price = db.Column(db.DECIMAL(10, 2), nullable=False)
     order_date = db.Column(db.Date, index=True, nullable=False)

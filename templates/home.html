@@ -1,139 +1,181 @@
-{% extends "base.html" %}
-{% block title %}Home{% endblock %}
-
-{% block content %}
-<br>
-{% if current_user.is_authenticated %}
-<h1 align="center">Hi, {{ current_user.username }}!</h1>
-<br>
-{% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
-<div class="container">
-  <div class="card">
-    <div class="card-header">
-      <h4>Dashboard</h4>
-    </div>
-    <div class="card-body">
-      <div>
-        <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
-        <canvas id="revenueChart" width="900" height="380"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-{% else %}
-<h1 align="center">Hi, guest!</h1>
-{% endif %}
-
-{% if has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-<script>
-  var ctx = document.getElementById("myChart");
-
-  // Data passed from the backend
-  var labels = {{ last_7_days| safe }};
-  var orderPrices = {{ last_7_days_prices| safe }};
-
-  // Chart with proper labeling
-  var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,  // X-axis: Last 7 days (Day names)
-      datasets: [{
-        data: orderPrices,  // Y-axis: Total prices for each day
-        lineTension: 0,  // No curve in the line
-        backgroundColor: 'transparent',  // No background fill
-        borderColor: '#007bff',  // Line color
-        borderWidth: 4,  // Line thickness
-        pointBackgroundColor: '#007bff'  // Point color on the line
-      }]
-    },
-    options: {
-      title: {
-        display: true,
-        text: 'Total revenue generated in the last 7 days',  // Chart title
-        fontSize: 18
-      },
-      scales: {
-        yAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: 'US Dollars'  // Y-axis label
-          },
-          ticks: {
-            beginAtZero: false  // Do not start the Y-axis from zero
-          }
-        }],
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: 'Day of the Week'  // X-axis label
-          }
-        }]
-      },
-      legend: {
-        display: false,  // Display the legend
-        labels: {
-          boxWidth: 20,
-          padding: 15
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cedar Hill Tailor & Alteration</title>
+    <link rel="stylesheet" href="../static/css/home.css">
+    <script defer src="../static/js/home.js"></script>
+    <style>
+        /* Hero Section Styles */
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            overflow: hidden;
         }
-      },
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            // Add a dollar sign to the tooltip value
-            return '$' + tooltipItem.yLabel.toFixed(2);  // Formats value as $XX.XX
-          }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
-      }
+
+        .hero-section p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button, .cos-button {
+            background: #333;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0.5rem;
+        }
+
+        .cta-button:hover, .cos-button:hover {
+            background: #555;
+        }
+
+        /* Background Image Container */
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transform: scale(1);
+            transition: opacity 1.5s ease, transform 10s ease;
+        }
+
+        .background-image.active {
+            opacity: 1;
+            transform: scale(1.1); /* More noticeable zoom */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Cedar Hill Tailor</div>
+            <ul class="nav-links">
+                <li><a href="#about">About us</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact">Contact us</a></li>
+                <li><a href="/dashboard">Employee portal</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero-section">
+        <div class="hero-background">
+            <div class="background-image" style="background-image: url('../static/images/1.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/2.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/3.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/4.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/5.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/6.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/7.jpg');"></div>
+            <div class="background-image" style="background-image: url('../static/images/8.jpg');"></div>
+        </div>
+        <h1>Cedar Hill Tailor</h1>
+        <p>Your one-stop destination for custom tailoring excellence.</p>
+        <a href="/search-orders" class="cos-button">Check Order Status</a>
+        <br>
+        <a href="#services" class="cta-button">Explore Services</a>
+    </section>
+
+    <section id="about" class="about-section">
+        <h2>About us</h2>
+        <p>We pride ourselves on creating bespoke garments that fit you perfectly. With years of experience and a passion for style, we craft clothing that embodies elegance and sophistication.</p>
+    </section>
+
+    <section id="services" class="services-section">
+        <h2>Services</h2>
+        <ul>
+            <li>Custom Suit Tailoring</li>
+            <li>Alterations & Repairs</li>
+            <li>Wedding Attire</li>
+            <li>Corporate Wardrobe Solutions</li>
+        </ul>
+    </section>
+
+    <section id="portfolio" class="portfolio-section">
+        <h2>Portfolio</h2>
+        <div class="gallery">
+            <img src="../static/images/1.jpg">
+            <img src="../static/images/2.jpg">
+            <img src="../static/images/4.jpg">
+            <img src="../static/images/5.jpg">
+            <img src="../static/images/6.jpg">
+            <img src="../static/images/7.jpg">
+            <img src="../static/images/8.jpg">
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <h2>Contact us</h2>
+        <p>Have questions? We have answers!</p>
+        <p>444 FM1382 Ste A, Cedar Hill, TX 75104</p>
+        <p>469-272-9077</p>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Cedar Hill Tailor & Alteration. All rights reserved.</p>
+            <p>Follow us on:
+                <a href="#">Facebook</a> |
+                <a href="#">Instagram</a> |
+                <a href="#">Twitter</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+    // JavaScript for rotating background images with fade-in and zoom effect
+    const images = document.querySelectorAll('.background-image');
+    let currentIndex = 0;
+
+    function rotateBackgroundImages() {
+        images.forEach((img, index) => {
+            img.classList.remove('active');
+            if (index === currentIndex) {
+                img.classList.add('active');
+            }
+        });
+
+        currentIndex = (currentIndex + 1) % images.length;
     }
-  });
-</script>
 
-<script>
-  var ctx = document.getElementById("revenueChart").getContext('2d');
-
-  var myBarChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ revenue_by_garment_labels| safe }},  // Garment names
-  datasets: [{
-    label: 'US Dollars',
-    data: {{ revenue_by_garment_data| safe }},  // Revenue values
-    backgroundColor: '#007bff'
-            }]
-        },
-  options: {
-    title: {
-      display: true,
-        text: 'Most revenue by garment type (all time)',
-          fontSize: 18
-    },
-    legend: {
-      display: false  // Disable the legend
-    },
-    scales: {
-      yAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: 'US Dollars'  // Correct label for Y-axis
-        },
-        ticks: {
-          beginAtZero: true
-        }
-      }],
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: 'Garment Type'  // Correct label for X-axis
-          }
-        }]
-    }
-  }
+    // Initial activation with delay to trigger zoom effect
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            images[0].classList.add('active');
+        }, 100); // Slight delay ensures the animation is applied
     });
-</script>
 
-
-{% endif %}
-
-{% endblock %}
+    // Start rotation every 5 seconds
+    setInterval(rotateBackgroundImages, 5000);
+    </script>
+</body>
+</html>

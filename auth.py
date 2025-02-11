@@ -25,7 +25,7 @@ def manager_required(func):
             return func(*args, **kwargs)
         else:
             flash('Unauthorized access', category='error')
-            return redirect(url_for('views.home'))
+            return redirect(url_for('views.dashboard'))
     return decorated_func
 
 def admin_required(func):
@@ -35,7 +35,7 @@ def admin_required(func):
             return func(*args, **kwargs)
         else:
             flash('Unauthorized access', category='error')
-            return redirect(url_for('views.home'))
+            return redirect(url_for('views.dashboard'))
     return decorated_func
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -65,7 +65,7 @@ def login():
             flash('Logged in successfully', category='success')
             login_user(user, remember=True)
             # email_alert('Cedar Hill Alteration - Login Alert', user.username + " logged in from I.P. address " + request.remote_addr, 'email@gmail.com')
-            return redirect(url_for('views.home'))
+            return redirect(url_for('views.dashboard'))
         else:
             flash('Invalid login', category='error')
 

@@ -116,6 +116,10 @@
             required>
         </div>
         <br>
+        <div class="col">
+          <input type="text" class="form-control" name="legacy_id" id="legacy-id" placeholder="Legacy ID (optional)">
+        </div>
+        <br>
         <div id="price" class="text-md-right">
           <p name="subtotal" class="font-weight-normal">Subtotal: </p>
           <p name="sales_tax" class="font-weight-normal">Sales tax: </p>
@@ -137,6 +141,11 @@
 <br>
 
 <script>
+
+const legacyIdInput = document.getElementById("legacy-id");
+legacyIdInput.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, '');
+  });
 
   // Initialize an array to hold the total prices of each item
   let itemTotalPrices = [];

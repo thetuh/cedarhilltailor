@@ -14,11 +14,28 @@
       value="{{order_id if order_id}}">
     </div>
     
+    {% if current_user.is_authenticated and (has_role(current_user, 'admin') or has_role(current_user, 'manager')) %}
+
     <!-- Phone Number -->
     <div class="col">
       <input type="tel" class="form-control" name="phone_number" id="phone-number" placeholder="Phone Number"
       value="{{phone_number if phone_number}}">
     </div>
+
+    {% endif %}
+
+  </div>
+
+  <br>
+
+  {% if current_user.is_authenticated and (has_role(current_user, 'admin') or has_role(current_user, 'manager')) %}
+
+  <div class="row">
+        <!-- Legacy ID -->
+        <div class="col">
+          <input type="text" class="form-control" name="legacy_id" id="legacy-id" placeholder="Legacy ID"
+          value="{{legacy_id if legacy_id}}">
+        </div>
 
     <!-- Status -->
     <div class="col">
@@ -28,6 +45,7 @@
         <option value="1" {% if status == '1' %}selected{% endif %}>Complete</option>
       </select>
     </div>
+
   </div>
 
   <br>
@@ -47,6 +65,12 @@
       <input type="date" class="form-control mt-2" name="completion_end_date" value="{{completion_end_date}}">
     </div>
 
+  </div>
+
+  <br>
+
+  <div class="row">
+
     <!-- Sort By -->
     <div class="col">
       <label>Sort By</label>
@@ -55,9 +79,12 @@
         <option value="order_id_asc" {% if sort_by == 'order_id_asc' %}selected{% endif %}>Order ID (Low to High)</option>
       </select>
     </div>
+
   </div>
 
   <br>
+
+  {% endif %}
 
   <div class="text-center">
     <button type="submit" class="btn btn-primary">Filter & Sort</button>
@@ -72,10 +99,18 @@
       <th>Order Date</th>
       <th>Completion Date</th>
       <th>Status</th>
-      {% if has_role(current_user, 'admin') or has_role(current_user, 'manager') or has_role(current_user, 'seamstress') %}
-      <th>Customer</th>
-      <th>Actions</th>
+
+      {% set is_admin_or_manager = has_role(current_user, 'admin') or has_role(current_user, 'manager') %}
+      {% set is_seamstress_or_above = is_admin_or_manager or has_role(current_user, 'seamstress') %}
+
+      {% if is_admin_or_manager %}
+        <th>Customer</th>
       {% endif %}
+
+      {% if is_seamstress_or_above %}
+        <th>Actions</th>
+      {% endif %}
+
     </tr>
   </thead>
   <tbody>
@@ -115,7 +150,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Order ID #{{order.id}}</h4>
+              <h4 class="modal-title">Order ID #{{ order.id }}{% if order.legacy_id %} | Legacy ID #{{ order.legacy_id }}{% endif %}</h4>
             </div>
             <div class="modal-body">
                 <form action="{{url_for('views.edit_order')}}" method="POST">
@@ -184,6 +219,7 @@
                                 <tr>
                                     <th>Job</th>
                                     <th>Status</th>
+                                    <th>Completed by</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -195,11 +231,29 @@
                                             name="job_status_{{ item_job.item_id }}_{{ item_job.pair_id }}" value="1" {%
                                             if item_job.status==1 %}checked{% endif %}>
                                     </td>
+                                    <td>
+                                      <select class="custom-select custom-select-sm" name="completed_by">
+                                        {% for user in user_list %}
+                                            <option value="{{ user.id }}" 
+                                                {% if item_job.completed_by_id == user.id %}
+                                                    selected
+                                                {% elif item_job.completed_by_id is none and user.id == current_user.id %}
+                                                    selected
+                                                {% endif %}>
+                                                {{ user.username }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>                                                                                                                              
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table><br>
                         {% endfor %}
+                    </div>
+                    <div id="wrapper" style="display: flex; flex-direction: column; align-items: center;">
+                      <label for="pickedUp">Order picked up</label>
+                      <input type="checkbox" id="pickedUp" name="picked-up" style="margin-bottom: 12px;">
                     </div>
                     <div id="wrapper">
                         <button style='margin-right:16px' class="btn btn-primary" type="submit">Confirm</button>
@@ -219,7 +273,7 @@
     {% for page_num in order_pagination.iter_pages() %}
     <li class="page-item {% if page_num == order_pagination.page %}active{% endif %}">
       <a class="page-link" href="{{ url_for('views.search_orders', page=page_num, order_id=order_id,
-      phone_number=phone_number, status=status, order_start_date=order_start_date, order_end_date=order_end_date,
+      phone_number=phone_number, legacy_id=legacy_id, status=status, order_start_date=order_start_date, order_end_date=order_end_date,
       completion_start_date=completion_start_date, completion_end_date=completion_end_date, sort_by=sort_by) }}">{{ page_num }}</a>
     </li>
     {% endfor %}
@@ -232,9 +286,14 @@
 
 <script>
   const orderIdInput = document.getElementById("order-id");
+  const legacyIdInput = document.getElementById("legacy-id");
   const phoneInput = document.getElementById('phone-number');
 
   orderIdInput.addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, '');
+  });
+
+  legacyIdInput.addEventListener("input", function () {
     this.value = this.value.replace(/\D/g, '');
   });
 
@@ -251,6 +310,7 @@
     const query = new URLSearchParams({
       order_id: document.getElementById('order-id').value,
       phone_number: document.getElementById('phone-number').value,
+      legacy_id: document.getElementById('legacy-id').value,
       status: document.getElementById('status').value,
       order_start_date: filterForm.querySelector('[name="order_start_date"]').value,
       order_end_date: filterForm.querySelector('[name="order_end_date"]').value,

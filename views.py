@@ -20,6 +20,7 @@ MAX_ITEMS_PER_PAGE = 8
 
 # [ HELPER METHODS ] -----------------------------------------------
 @views.route('/fetch-sales-tax-rate', methods=['GET'])
+@login_required
 def fetch_sales_tax_rate():
     globals_record = Globals.query.first()
     if globals_record:
@@ -130,9 +131,13 @@ def upload_image_to_bucket(file, filename):
     # Return the URL to the uploaded file
     return blob.public_url
 
-# [ GUEST / SEAMSTRESS ROUTES ] -----------------------------------------------
 @views.route('/')
 def home():
+    return render_template('home.html')
+
+@views.route('/dashboard')
+@login_required
+def dashboard():
     if current_user.is_authenticated:
         today = datetime.today()
         start_date = today - timedelta(days=6)
@@ -182,69 +187,82 @@ def home():
         prices = list(last_7_days_prices.values())
 
         return render_template(
-            'home.html', 
+            'dashboard.html', 
             last_7_days=labels, 
             last_7_days_prices=prices, 
             revenue_by_garment_labels=revenue_by_garment_labels, 
             revenue_by_garment_data=revenue_by_garment_data
         )
 
-    return render_template('home.html')
+    return render_template('dashboard.html')
 
 @views.route('/search-orders')
 def search_orders():
+    user_list = User.query.order_by(User.username).all()
     page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='per_page')
     per_page = MAX_ITEMS_PER_PAGE
 
-    # Get filter and sort options from request arguments
-    order_id = request.args.get('order_id')
+    # Initialize filter values from request args
+    filters = {
+        "order_id": request.args.get("order_id"),
+        "phone_number": request.args.get("phone_number"),
+        "legacy_id": request.args.get("legacy_id"),
+        "status": request.args.get("status"),
+        "start_date": request.args.get("order_start_date"),
+        "end_date": request.args.get("order_end_date"),
+        "completion_start_date": request.args.get("completion_start_date"),
+        "completion_end_date": request.args.get("completion_end_date"),
+        "sort_by": request.args.get("sort_by", "order_date_desc"),
+    }
 
-    unstripped_phone_number = None
-    phone_number = request.args.get('phone_number')
-    if phone_number:
-        unstripped_phone_number = phone_number
-        phone_number = phone_number.replace('-', '')
+    # Normalize phone number input
+    unstripped_phone_number = filters["phone_number"]
+    if unstripped_phone_number:
+        filters["phone_number"] = unstripped_phone_number.replace("-", "")
 
-    status = request.args.get('status')
-    start_date = request.args.get('order_start_date')
-    end_date = request.args.get('order_end_date')
-    completion_start_date = request.args.get('completion_start_date')
-    completion_end_date = request.args.get('completion_end_date')
-    sort_by = request.args.get('sort_by', 'order_date_desc')
-
-    # Base query with join to Customer for phone number filtering
-    query = Order.query.join(Customer).filter(Customer.id == Order.customer_id)
-
-    # Apply filters
-    if order_id:
-        query = query.filter(Order.id == order_id)
-    if phone_number:
-        query = query.filter(Customer.phone_number == phone_number)
-    if status:
-        query = query.filter(Order.status == int(status))
-    if start_date:
-        query = query.filter(Order.order_date >= start_date)
-    if end_date:
-        query = query.filter(Order.order_date <= end_date)
-    if completion_start_date:
-        query = query.filter(Order.completion_date >= completion_start_date)
-    if completion_end_date:
-        query = query.filter(Order.completion_date <= completion_end_date)
-
-    # Apply sorting
-    if sort_by == 'order_id_asc':
-        query = query.order_by(Order.id.asc())
+    # Guests and seamstresses can only search by order ID
+    restricted_roles = {"guest", "seamstress"}
+    if current_user.is_anonymous or (hasattr(current_user, "role") and current_user.role.name in restricted_roles):
+        query = Order.query.filter(Order.id == filters["order_id"]) if filters["order_id"] else Order.query.filter(False)
     else:
-        query = query.order_by(Order.id.desc())
-    
+        query = Order.query.join(Customer).filter(Customer.id == Order.customer_id)
+
+        # Construct filter conditions dynamically
+        filter_conditions = []
+
+        if filters["order_id"]:
+            filter_conditions.append(Order.id == filters["order_id"])
+        if filters["phone_number"]:
+            filter_conditions.append(Customer.phone_number == filters["phone_number"])
+        if filters["legacy_id"]:
+            filter_conditions.append(Order.legacy_id == filters["legacy_id"])
+        if filters["status"]:
+            filter_conditions.append(Order.status == int(filters["status"]))
+        if filters["start_date"]:
+            filter_conditions.append(Order.order_date >= filters["start_date"])
+        if filters["end_date"]:
+            filter_conditions.append(Order.order_date <= filters["end_date"])
+        if filters["completion_start_date"]:
+            filter_conditions.append(Order.completion_date >= filters["completion_start_date"])
+        if filters["completion_end_date"]:
+            filter_conditions.append(Order.completion_date <= filters["completion_end_date"])
+
+        # Apply filters to the query only if conditions exist
+        if filter_conditions:
+            query = query.filter(*filter_conditions)
+
+        # Sorting
+        query = query.order_by(Order.id.asc() if filters["sort_by"] == "order_id_asc" else Order.id.desc())
+
     # Paginate results
     order_pagination = query.paginate(page=page, per_page=per_page)
 
-    return render_template('search-orders.html', order_pagination=order_pagination,
-                           order_id=order_id, phone_number=unstripped_phone_number, status=status,
-                           order_start_date=start_date, order_end_date=end_date,
-                           completion_start_date=completion_start_date, completion_end_date=completion_end_date,
-                           sort_by=sort_by)
+    # Pass values dynamically to template, with filters dict containing all args
+    return render_template(
+        "search-orders.html",
+        order_pagination=order_pagination, user_list=user_list,
+        **{key: value if current_user.is_authenticated and value else None for key, value in filters.items()},
+    )
 
 @views.route('/search-id/<int:order_id>')
 def search_id(order_id):
@@ -320,6 +338,8 @@ def create_order():
         last_name = request.form.get('last-name')
         phone_number = request.form.get('phone-number').replace('-', '')
         completion_date_str = request.form.get('date')
+        legacy_id = request.form.get('legacy_id')
+        legacy_id = int(legacy_id) if legacy_id and legacy_id.isdigit() else None
 
         # Validate input
         errors = validate_order_input(first_name, last_name, phone_number, completion_date_str)
@@ -362,7 +382,8 @@ def create_order():
                 price=total_price,  # Use the calculated total price
                 order_date=datetime.now().date(),
                 completion_date=completion_date,
-                status=OrderStatus.INCOMPLETE.value
+                status=OrderStatus.INCOMPLETE.value,
+                legacy_id=legacy_id
             )
             db.session.add(new_order)
             db.session.flush()  # Flush to get order ID
@@ -668,11 +689,11 @@ def update_status(order_id):
             
             if request.form.get(checkbox_name):  # If the job is marked as complete
                 item_job.status = 1
-                
-                # If the job was incomplete before, record completion details
+                item_job.completed_by_id = request.form.get('completed_by')  # Track the user who completed it
+
+                # Only update completion time if not complete before
                 if item_job.completed_by_id is None:
-                    item_job.completed_by_id = current_user.id  # Track the user who completed it
-                    item_job.completion_time = datetime.utcnow()  # Set completion time
+                    item_job.completion_time = datetime.utcnow()
             else:
                 item_job.status = 0
                 item_job.completed_by_id = None
@@ -683,7 +704,7 @@ def update_status(order_id):
     db.session.commit()
     
     flash('Job statuses updated successfully', 'success')
-    return redirect(url_for('views.search_orders', order_id=order_id))
+    return redirect(url_for('views.search_orders'))
 
 @views.route('/users/delete/<int:id>')
 @login_required
