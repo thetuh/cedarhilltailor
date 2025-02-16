@@ -218,7 +218,7 @@ def search_orders():
     # Normalize phone number input
     unstripped_phone_number = filters["phone_number"]
     if unstripped_phone_number:
-        filters["phone_number"] = unstripped_phone_number.replace("-", "")
+        filters["phone_number"] = unstripped_phone_number
 
     # Guests and seamstresses can only search by order ID
     restricted_roles = {"guest", "seamstress"}
@@ -277,7 +277,7 @@ def search_id(order_id):
 
 @views.route('/search-number/<phone_number>')
 def search_number(phone_number):
-    stripped_phone_number = phone_number.replace('-', '')
+    stripped_phone_number = phone_number
 
     page, per_page, offset = get_page_args(page_parameter='page',
                                             per_page_parameter='per_page')
@@ -336,10 +336,11 @@ def create_order():
     if request.method == 'POST':
         first_name = request.form.get('first-name')
         last_name = request.form.get('last-name')
-        phone_number = request.form.get('phone-number').replace('-', '')
+        phone_number = request.form.get('phone-number')
         completion_date_str = request.form.get('date')
         legacy_id = request.form.get('legacy_id')
         legacy_id = int(legacy_id) if legacy_id and legacy_id.isdigit() else None
+        action = request.form.get('action', 'create')  # Default to 'create' if missing
 
         # Validate input
         errors = validate_order_input(first_name, last_name, phone_number, completion_date_str)
@@ -407,7 +408,11 @@ def create_order():
 
             # Commit after all operations
             db.session.commit()
+
             flash(f'Successfully created order ID #{new_order.id}', category='success')
+
+            if action == 'print':
+                return render_template('create-order.html', new_order=new_order, subtotal=subtotal, sales_tax=sales_tax, garment_list=garment_list)
 
         except Exception as e:
             db.session.rollback()  # Rollback in case of an error
@@ -429,7 +434,7 @@ def edit_order_hard(order_id):
     elif request.method == 'POST':
         first_name = request.form.get('first-name')
         last_name = request.form.get('last-name')
-        phone_number = request.form.get('phone-number').replace('-', '')
+        phone_number = request.form.get('phone-number')
         completion_date_str = request.form.get('date')
 
         try:

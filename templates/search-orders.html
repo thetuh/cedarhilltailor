@@ -53,14 +53,14 @@
   <div class="row">
     <!-- Order Date -->
     <div class="col">
-      <label>Order Date</label>
+      <label>Order date range</label>
       <input type="date" class="form-control" name="order_start_date" value="{{order_start_date}}">
       <input type="date" class="form-control mt-2" name="order_end_date" value="{{order_end_date}}">
     </div>
 
     <!-- Completion Date -->
     <div class="col">
-      <label>Completion Date</label>
+      <label>Completion date range</label>
       <input type="date" class="form-control" name="completion_start_date" value="{{completion_start_date}}">
       <input type="date" class="form-control mt-2" name="completion_end_date" value="{{completion_end_date}}">
     </div>
@@ -73,7 +73,7 @@
 
     <!-- Sort By -->
     <div class="col">
-      <label>Sort By</label>
+      <label>Sort by</label>
       <select class="form-control" name="sort_by" id="sort-by">
         <option value="order_id_desc" {% if sort_by == 'order_id_desc' %}selected{% endif %}>Order ID (High to Low)</option>
         <option value="order_id_asc" {% if sort_by == 'order_id_asc' %}selected{% endif %}>Order ID (Low to High)</option>

@@ -55,7 +55,7 @@
   <div class="container">
     <div class="card">
       <div class="card-header">
-        <h4>Invoice</h4>
+        <h4>Service details</h4>
       </div>
       <div class="card-body">
         <table class="table table-sm table-bordered">
@@ -131,16 +131,220 @@
 
   <br>
 
+  <input type="hidden" name="action" id="action" value="create">  <!-- Hidden input to track action -->
+
   <div id="wrapper">
     <button type="submit" class="btn btn-primary">Create</button>
   </div>
 
+  <br>
+
+  <div id="wrapper">
+    <button type="submit" class="btn btn-primary" onclick="document.getElementById('action').value='print'">
+      Create and Print
+  </button>
+  </div>
+
 </form>
+
+<button id="hiddenPrintButton" style="display:none;" onclick="printInvoice()">print</button>
+
+{% if new_order %}
+<script>
+  window.onload = function() {
+      document.getElementById('hiddenPrintButton').click();
+  };
+</script>
+{% endif %}
 
 <br>
 <br>
 
 <script>
+
+function printInvoice()
+{
+  // Open the invoice page in a new window
+  const invoiceWindow = window.open('', '', 'width=800,height=600');
+
+  // Here you can paste the HTML content for the invoice
+  const invoiceContent = `
+  {% if new_order %}
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link id="invoiceStylesheet" rel="stylesheet" href="/static/css/invoice.css" type="text/css" media="all" />
+  </head>
+
+  <body>
+    <div>
+      <div class="py-4">
+        <div class="px-14 py-6">
+          <table class="w-full border-collapse border-spacing-0">
+            <tbody>
+              <tr>
+                <td class="w-full align-top">
+                  <div>
+                    <img src="../static/images/logo.png" class="h-13">
+                  </div>
+                </td>
+
+                <td class="align-top">
+                  <div class="text-sm">
+                    <table class="border-collapse border-spacing-0">
+                      <tbody>
+                        <tr>
+                          <td class="border-r pr-4">
+                            <div>
+                              <p class="whitespace-nowrap text-slate-400 text-center">Date</p>
+                              <p class="whitespace-nowrap font-bold text-main text-center">{{ new_order.order_date.strftime('%B %d, %Y') }}</p>
+                            </div>
+                          </td>
+                          <td class="pl-4">
+                            <div>
+                              <p class="whitespace-nowrap text-slate-400 text-center">Order #</p>
+                              <p class="whitespace-nowrap font-bold text-main text-center">{{ new_order.id }}</p>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-slate-100 px-14 py-6 text-sm">
+          <table class="w-full border-collapse border-spacing-0">
+            <tbody>
+              <tr>
+                <td class="w-1/2 align-top">
+                  <div class="text-sm text-neutral-600">
+                    <p class="font-bold">Cedar Hill Tailor & Alteration</p>
+                    <p>444 FM1382 Ste A</p>
+                    <p>Cedar Hill, TX 75104</p>
+                    <p>469-272-9077</p>
+                  </div>
+                </td>
+                <td class="w-1/2 align-top text-right">
+                  <div class="text-sm text-neutral-600">
+                    <p class="font-bold">Customer Details</p>
+                    <p>{{ new_order.customer.first_name }} {{ new_order.customer.last_name }}</p>
+                    <p>{{ new_order.customer.phone_number }}</p>
+                    <p></p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="px-14 py-10 text-sm text-neutral-700">
+          <table class="w-full border-collapse border-spacing-0">
+            <thead>
+              <tr>
+                <td class="border-b-2 border-main pb-3 pl-3 font-bold text-main">#</td>
+                <td class="border-b-2 border-main pb-3 pl-2 font-bold text-main">Garment</td>
+                <td class="border-b-2 border-main pb-3 pl-2 font-bold text-main">Job(s)</td>
+                <td class="border-b-2 border-main pb-3 pl-2 pr-3 text-right font-bold text-main">Price</td>
+              </tr>
+            </thead>
+            <tbody>
+                {% for order_item in new_order.order_items %}
+                <tr>
+                  <td class="border-b py-3 pl-3">{{ loop.index }}.</td>
+                  <td class="border-b py-3 pl-2">{{ order_item.item_jobs[0].pair.garment.name }}</td>
+                  <td class="border-b py-3 pl-2">
+                    {% for item_job in order_item.item_jobs %}
+                      {{ item_job.pair.job.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                  </td>
+                  <td class="border-b py-3 pl-2 pr-3 text-right">${{ "%.2f"|format(order_item.price) }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                <td colspan="7">
+                  <table class="w-full border-collapse border-spacing-0">
+                    <tbody>
+                      <tr>
+                        <td class="w-full"></td>
+                        <td>
+                          <table class="w-full border-collapse border-spacing-0">
+                            <tbody>
+                              <tr>
+                                <td class="border-b p-3">
+                                  <div class="whitespace-nowrap text-slate-400">Subtotal:</div>
+                                </td>
+                                <td class="border-b p-3 text-right">
+                                  <div class="whitespace-nowrap font-bold text-main">${{ "%.2f"|format(subtotal) }}</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="p-3">
+                                  <div class="whitespace-nowrap text-slate-400">Sales tax:</div>
+                                </td>
+                                <td class="p-3 text-right">
+                                  <div class="whitespace-nowrap font-bold text-main">${{ "%.2f"|format(sales_tax) }}</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="bg-main p-3">
+                                  <div class="whitespace-nowrap font-bold text-white">Total:</div>
+                                </td>
+                                <td class="bg-main p-3 text-right">
+                                  <div class="whitespace-nowrap font-bold text-white">${{ "%.2f"|format(new_order.price) }}</div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="px-14 py-10 text-sm text-neutral-700">
+          <p class="text-main font-bold">Notes</p>
+          <p class="italic">Thank you for choosing Cedar Hill Tailor & Alteration! We appreciate your business and look forward to serving you again.</p>
+          </div>
+
+          <footer class="fixed bottom-0 left-0 bg-slate-100 w-full text-neutral-600 text-center text-xs py-3">
+            Cedar Hill Tailor & Alteration
+            <span class="text-slate-300 px-2">|</span>
+            cedarhilltailor.com
+            <span class="text-slate-300 px-2">|</span>
+            469-272-9077
+          </footer>
+        </div>
+      </div>
+  </body>
+  </html>
+  {% endif %}
+  `;
+
+  // Write the content to the new window
+  invoiceWindow.document.write(invoiceContent);
+
+  // Wait until the content is fully loaded, then print
+  invoiceWindow.document.close();
+
+  const link = invoiceWindow.document.getElementById('invoiceStylesheet');
+    link.onload = () => {
+        setTimeout(() => {
+            invoiceWindow.print();
+        }, 500);  // Delay printing for 500ms to ensure everything is loaded
+    };
+}
 
 const legacyIdInput = document.getElementById("legacy-id");
 legacyIdInput.addEventListener("input", function () {

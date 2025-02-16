@@ -99,7 +99,7 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
-    phone_number = db.Column(db.String(10), unique=True, index=True)
+    phone_number = db.Column(db.String(12), unique=True, index=True)
 
     # One-to-many (Order)
     orders = db.relationship('Order', backref='customer', lazy='joined')

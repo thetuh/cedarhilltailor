@@ -90,50 +90,6 @@
   });
 </script>
 
-<script>
-  var ctx = document.getElementById("revenueChart").getContext('2d');
-
-  var myBarChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ revenue_by_garment_labels| safe }},  // Garment names
-  datasets: [{
-    label: 'US Dollars',
-    data: {{ revenue_by_garment_data| safe }},  // Revenue values
-    backgroundColor: '#007bff'
-            }]
-        },
-  options: {
-    title: {
-      display: true,
-        text: 'Most revenue by garment type (all time)',
-          fontSize: 18
-    },
-    legend: {
-      display: false  // Disable the legend
-    },
-    scales: {
-      yAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: 'US Dollars'  // Correct label for Y-axis
-        },
-        ticks: {
-          beginAtZero: true
-        }
-      }],
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: 'Garment Type'  // Correct label for X-axis
-          }
-        }]
-    }
-  }
-    });
-</script>
-
-
 {% endif %}
 
 {% endblock %}
